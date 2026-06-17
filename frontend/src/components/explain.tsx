@@ -21,7 +21,7 @@ export default function Explain() {
       try {
         setLoading(true);
         // Find champion model
-        const resModels = await fetch('http://localhost:8000/api/v1/models/leaderboard', {
+        const resModels = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/models/leaderboard', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const models = await resModels.json();

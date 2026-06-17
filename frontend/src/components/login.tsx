@@ -27,7 +27,7 @@ export default function Login({ onBackToLanding }: LoginProps) {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:8000/api/v1/auth/login', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -37,7 +37,7 @@ export default function Login({ onBackToLanding }: LoginProps) {
       if (res.ok) {
         setToken(data.access_token);
 
-        const profileResponse = await fetch('http://localhost:8000/api/v1/auth/me', {
+        const profileResponse = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/auth/me', {
           headers: { Authorization: `Bearer ${data.access_token}` },
         });
         const profile = await profileResponse.json();

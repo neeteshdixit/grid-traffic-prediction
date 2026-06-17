@@ -62,13 +62,13 @@ export default function Dashboard() {
 
       try {
         const [modelsResponse, datasetsResponse, predictionsResponse] = await Promise.all([
-          fetch('http://localhost:8000/api/v1/models/leaderboard', {
+          fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/models/leaderboard', {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch('http://localhost:8000/api/v1/datasets', {
+          fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/datasets', {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch('http://localhost:8000/api/v1/predictions', {
+          fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/predictions', {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

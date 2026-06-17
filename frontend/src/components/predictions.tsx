@@ -19,7 +19,7 @@ export default function Predictions() {
   const fetchMetadata = async () => {
     try {
       // Models leaderboard
-      const resModels = await fetch('http://localhost:8000/api/v1/models/leaderboard', {
+      const resModels = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/models/leaderboard', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const dataModels = await resModels.json();
@@ -29,7 +29,7 @@ export default function Predictions() {
       }
 
       // Predictions list
-      const resPreds = await fetch('http://localhost:8000/api/v1/predictions', {
+      const resPreds = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/predictions', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const dataPreds = await resPreds.json();
@@ -52,7 +52,7 @@ export default function Predictions() {
     setMessage(null);
 
     try {
-      const res = await fetch('http://localhost:8000/api/v1/predictions/score', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/predictions/score', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

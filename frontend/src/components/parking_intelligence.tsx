@@ -73,7 +73,7 @@ export default function ParkingIntelligence() {
     async function fetchHotspots() {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:8000/api/v1/parking/hotspots', {
+        const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/parking/hotspots', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {

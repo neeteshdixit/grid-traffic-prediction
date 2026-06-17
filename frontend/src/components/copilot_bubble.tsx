@@ -57,7 +57,7 @@ export default function CopilotBubble() {
     setMessages((prev) => [...prev, userMsg]);
 
     try {
-      const res = await fetch('http://localhost:8000/api/v1/copilot/chat', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/copilot/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

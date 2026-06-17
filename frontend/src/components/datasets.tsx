@@ -20,7 +20,7 @@ export default function Datasets() {
 
   const fetchDatasets = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/v1/datasets', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/datasets', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -48,7 +48,7 @@ export default function Datasets() {
     formData.append('file', file);
 
     try {
-      const res = await fetch('http://localhost:8000/api/v1/datasets/upload', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/datasets/upload', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData

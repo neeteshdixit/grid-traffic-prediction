@@ -15,7 +15,7 @@ export default function AuditLogs() {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/api/v1/admin/audit-logs', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/admin/audit-logs', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();

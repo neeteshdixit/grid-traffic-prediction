@@ -33,7 +33,7 @@ export default function Training() {
   const fetchMetadata = async () => {
     try {
       // Leaderboard models
-      const resLb = await fetch('http://localhost:8000/api/v1/models/leaderboard', {
+      const resLb = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/models/leaderboard', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const dataLb = await resLb.json();
@@ -65,7 +65,7 @@ export default function Training() {
     logToConsole("Splitting dataset records into spatial groups...");
 
     try {
-      const res = await fetch('http://localhost:8000/api/v1/training/start', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/training/start', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

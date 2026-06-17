@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafficAI - Video Pitch Script Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050814;
+            --card-bg: #0b112c;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --cyan: #22d3ee;
+            --sky: #38bdf8;
+            --rose: #f43f5e;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2.5rem 1.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            color: var(--cyan);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .metadata {
+            display: inline-flex;
+            gap: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.5rem 1.5rem;
+            border-radius: 99px;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .metadata strong {
+            color: var(--text-main);
+        }
+
+        .speaker-section {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .speaker-section.sp1 { border-left: 6px solid var(--cyan); }
+        .speaker-section.sp2 { border-left: 6px solid var(--sky); }
+        .speaker-section.sp3 { border-left: 6px solid var(--rose); }
+
+        .speaker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .speaker-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sp1 .speaker-title { color: var(--cyan); }
+        .sp2 .speaker-title { color: var(--sky); }
+        .sp3 .speaker-title { color: var(--rose); }
+
+        .badge {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-weight: 600;
+        }
+
+        .sp1 .badge { background: rgba(34, 211, 238, 0.1); color: var(--cyan); }
+        .sp2 .badge { background: rgba(56, 189, 248, 0.1); color: var(--sky); }
+        .sp3 .badge { background: rgba(244, 63, 94, 0.1); color: var(--rose); }
+
+        .role {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .time-marker {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding-top: 0.25rem;
+        }
+
+        .sp1 .time-marker { color: rgba(34, 211, 238, 0.8); }
+        .sp2 .time-marker { color: rgba(56, 189, 248, 0.8); }
+        .sp3 .time-marker { color: rgba(244, 63, 94, 0.8); }
+
+        .content-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .visual-instruction {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            color: #cbd5e1;
+        }
+
+        .visual-instruction strong {
+            color: var(--text-main);
+        }
+
+        .speech-script {
+            font-size: 1rem;
+            color: #cbd5e1;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 1rem;
+            border-radius: 12px;
+            border-left: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .speech-script strong {
+            color: var(--text-main);
+        }
+
+        .tips-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .tips-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            color: var(--cyan);
+            margin-bottom: 1rem;
+        }
+
+        .tips-list {
+            list-style-type: none;
+        }
+
+        .tips-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .tips-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--cyan);
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .timeline-item {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            body {
+                padding: 1.5rem 1rem;
+            }
+        }
+
+        /* Print styles optimization */
+        @media print {
+            body {
+                background-color: #ffffff;
+                color: #000000;
+                padding: 0;
+            }
+
+            :root {
+                --bg-color: #ffffff;
+                --card-bg: #ffffff;
+                --text-main: #000000;
+                --text-muted: #475569;
+                --cyan: #0891b2;
+                --sky: #0284c7;
+                --rose: #be123c;
+                --border-color: #e2e8f0;
+            }
+
+            .speaker-section {
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #cbd5e1;
+                margin-bottom: 2rem;
+            }
+
+            .speech-script {
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                color: #000000;
+            }
+
+            .visual-instruction {
+                background: #f1f5f9;
+                color: #000000;
+            }
+
+            .metadata {
+                border: 1px solid #cbd5e1;
+            }
+            
+            .tips-section {
+                page-break-inside: avoid;
+                border: 1px solid #cbd5e1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>TRAFFICAI - VIDEO PITCH SCRIPT</h1>
+        <p class="subtitle">Flipkart GRID Round 2 Collaborative Presentation Guide</p>
+        <div class="metadata">
+            <span>Duration: <strong>3 Minutes (180s)</strong></span>
+            <span>Target: <strong>Round 2 Focus</strong></span>
+            <span>Speakers: <strong>3 Members</strong></span>
+        </div>
+    </header>
+
+    <!-- SPEAKER 1 -->
+    <div class="speaker-section sp1">
+        <div class="speaker-header">
+            <div>
+                <div class="speaker-title">SPEAKER 1: THE UNIFIED VISION</div>
+                <div class="role">Team Lead / Product Presenter</div>
+            </div>
+            <span class="badge">0:00 - 1:00</span>
+        </div>
+
+        <!-- Segment 1 -->
+        <div class="timeline-item">
+            <div class="time-marker">0:00 - 0:15</div>
+            <div class="content-box">
+                <div class="visual-instruction"><strong>On Screen Visuals:</strong> Face camera (Team Intro) or display Slide 1 (Cover Page).</div>
+                <div class="speech-script">"Hello judges, we are Team <strong>[Team Name]</strong>. Today, we are pitching <strong>TrafficAI</strong>—a unified mobility intelligence ecosystem. While our Round 1 foundation forecast macro traffic demand, our Round 2 upgrade directly tackles the critical challenge of <strong>Poor Visibility on Parking-Induced Congestion</strong>."</div>
+            </div>
+        </div>
+
+        <!-- Segment 2 -->
+        <div class="timeline-item">
+            <div class="time-marker">0:15 - 0:40</div>
+            <div class="content-box">
+                <div class="visual-instruction"><strong>On Screen Visuals:</strong> Share screen showing the <strong>Overview Dashboard</strong>. Point out the metric cards for total hotspots, active violations, and average capacity blockage.</div>
+                <div class="speech-script">"Chaotic, illegal street parking chokes lane capacity and causes massive gridlocks, but police have had zero visibility. TrafficAI integrates our Round 1 <strong>LightGBM Champion Model</strong> (validation score of 0.7588) with new Round 2 density clustering to give city managers an active, unified console."</div>
+            </div>
+        </div>
+
+        <!-- Segment 3 -->
+        <div class="timeline-item">
+            <div class="time-marker">0:40 - 1:00</div>
+            <div class="content-box">
+                <div class="visual-instruction"><strong>On Screen Visuals:</strong> Navigate to the sidebar and highlight the transition from Round 1 tabs (Predictions) to Round 2 tabs (Parking Intel, Congestion, Enforcement).</div>
+                <div class="speech-script">"By connecting macro demand forecasting with micro-level parking violations, we allow traffic units to transition from reactive patrols to target-directed, proactive enforcement. I will now pass to our ML lead to explain our core analytics models."</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPEAKER 2 -->
+    <div class="speaker-section sp2">
+        <div class="speaker-header">
+            <div>
+                <div class="speaker-title">SPEAKER 2: ML & CONGESTION MATH</div>
+                <div class="role">ML Engineer / Data Scientist</div>
+            </div>
+            <span class="badge">1:00 - 2:00</span>
+        </div>
+
+        <!-- Segment 1 -->
+        <div class="timeline-item">
+            <div class="time-marker">1:00 - 1:20</div>
+            <div class="content-box">
+                <div class="visual-instruction"><strong>On Screen Visuals:</strong> Click on <strong>Parking Intelligence</strong> tab. Show the coordinate hotspot map.</div>
+                <div class="speech-script">"Our predictive engine runs on a dual-model pipeline. While Round 1 used LightGBM for demand spikes, for Round 2, we implement <strong>DBSCAN Density Clustering</strong> (<em>eps=110m</em>, <em>min_samples=3</em>). This groups 298,450 raw coordinates into localized parking hotspots, filtering out background noise."</div>
+            </div>
+        </div>
+
+        <!-- Segment 2 -->
+        <div class="timeline-item">
+            <div class="time-marker">1:20 - 1:40</div>
+            <div class="content-box">
+                <div class="visual-instruction"><strong>On Screen Visuals:</strong> Scroll down to the <strong>Growth Forecast</strong> charts. Point to the forecasted violation counts.</div>
+                <div class="speech-script">"To make this proactive, we deploy an <strong>ExtraTrees Regressor</strong>. It uses rolling lag sequences to forecast violation growth rates per hotspot over a 7-day horizon, showing dispatchers exactly which zones are expanding. We also run <strong>SHAP value explainability</strong> to show drivers of congestion."</div>
+            </div>
+        </div>
+
+        <!-- Segment 3 -->
+        <div class="timeline-item">
+            <div class="time-marker">1:40 - 2:00</div>
+            <div class="content-box">
+                <div class="visual-instruction"><strong>On Screen Visuals:</strong> Click on <strong>Congestion Impact</strong> tab. Hover over the vehicle distribution breakdown (Bikes vs. Cars vs. Trucks) and blockage percentages.</div>
+                <div class="speech-script">"To quantify the impact, we developed a Passenger Car Unit (PCU) blockage formula. A bike counts as 0.5 PCU, a car as 1.0, and a truck as 3.0. Combined with road width ratios, it calculates the percentage of capacity blocked, outputting a dynamic <strong>Congestion Score (0-100)</strong> to rank hotspots."</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPEAKER 3 -->
+    <div class="speaker-section sp3">
+        <div class="speaker-header">
+            <div>
+                <div class="speaker-title">SPEAKER 3: SIMULATION & DEPLOYMENT</div>
+                <div class="role">Full-Stack / Systems Engineer</div>
+            </div>
+            <span class="badge">2:00 - 3:00</span>
+        </div>
+
+        <!-- Segment 1 -->
+        <div class="timeline-item">
+            <div class="time-marker">2:00 - 2:20</div>
+            <div class="content-box">
+                <div class="visual-instruction"><strong>On Screen Visuals:</strong> Click on <strong>Enforcement Strategy</strong> tab. Drag the <strong>Additional Officers Slider</strong> back and forth, showing the violation reduction percentage updating live. Click <strong>Export Recommendations (CSV)</strong>.</div>
+                <div class="speech-script">"In the <strong>Smart Enforcement Studio</strong>, dispatchers can simulate officer dispatches. A logarithmic model estimates expected capacity clearance as officers are allocated. Operators can download these optimized schedules instantly with our new CSV strategic exporter."</div>
+            </div>
+        </div>
+
+        <!-- Segment 2 -->
+        <div class="timeline-item">
+            <div class="time-marker">2:20 - 2:40</div>
+            <div class="content-box">
+                <div class="visual-instruction"><strong>On Screen Visuals:</strong> Click the floating <strong>AI Parking Copilot</strong> chat bubble in the bottom right corner. Type: <em>"Which area needs action right now?"</em> and show the local Ollama LLM rendering the response.</div>
+                <div class="speech-script">"For offline decision support, we integrated a local <strong>Ollama RAG Copilot</strong> running Llama 3.2 1B. Because traffic operations require strict data privacy, the Copilot runs 100% offline, automatically compiling database summaries to answer dispatcher queries in natural language."</div>
+            </div>
+        </div>
+
+        <!-- Segment 3 -->
+        <div class="timeline-item">
+            <div class="time-marker">2:40 - 3:00</div>
+            <div class="content-box">
+                <div class="visual-instruction"><strong>On Screen Visuals:</strong> Open the code editor showing <code>docker-compose.yml</code> or the terminal. Conclude with Slide 10 or team face.</div>
+                <div class="speech-script">"The entire TrafficAI platform (Next.js, FastAPI, and indexed MongoDB) is fully containerized and deploys with a single <code>docker-compose up --build</code> command. TrafficAI is secure, portable, and ready to optimize city roads. Thank you!"</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips-section">
+        <div class="tips-title">💡 Pitch Recording Tips for your Team:</div>
+        <ul class="tips-list">
+            <li><strong>How to save as PDF:</strong> Open this file in your browser, press <strong>Ctrl + P</strong>, select "Save as PDF", and share it with your team on WhatsApp/Discord!</li>
+            <li><strong>Keep Screen Active:</strong> Keep the dashboard screen sharing active. One person can control the mouse and click the tabs as the respective speaker talks.</li>
+            <li><strong>Audio Checks:</strong> Make sure all members record in quiet rooms with good microphones. Speak clearly and confidently.</li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>

@@ -47,7 +47,7 @@ export default function CongestionImpact() {
     async function fetchCongestionData() {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:8000/api/v1/parking/congestion', {
+        const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/parking/congestion', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {

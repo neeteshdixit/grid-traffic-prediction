@@ -1,0 +1,80 @@
+=== TRAFFICAI: DEEP-DIVE SINGLE PRESENTER PITCH SCRIPT ===
+(Total Target Duration: 3 Minutes / 180 Seconds. Single Speaker Setup.)
+(Optimized for high-technical scoring by explaining mathematical formulas and model configurations.)
+
+================================================================================
+⏱️ SECTION 1: INTRODUCTION & OVERVIEW DASHBOARD (0:00 - 0:35)
+--------------------------------------------------------------------------------
+🖥️ SCREEN ACTION (क्या करना है):
+1. Start on the "Overview Dashboard" (http://localhost:3000).
+2. Hover over the metric card for "Active Model: LightGBM Champion".
+3. Move cursor to the "Validation R2" score card showing 0.7588.
+4. Point to the "Workspace Status" card in the left sidebar showing "System online and ready".
+
+🗣️ SPEECH SCRIPT (क्या बोलना है):
+"Hello judges, today I am presenting TrafficAI—an enterprise decision-support ecosystem that merges macro-level traffic demand forecasting with micro-level parking congestion intelligence to solve the critical Flipkart GRID Round 2 challenge: 'Poor Visibility on Parking-Induced Congestion'.
+
+We begin on our Overview Dashboard. The system's core architecture is built upon a unified framework. Our Round 1 foundation uses a high-performance Gradient Boosting framework—specifically our LightGBM Champion model—to predict timeseries traffic demand spikes, achieving a validation R2 score of 0.7588 across spatial geohash groups. 
+
+By integrating this demand model with our new Round 2 parking intelligence pipeline, TrafficAI gives municipal operators a single, cohesive interface to predict demand spikes and identify illegal parking bottlenecks before they lock up city lanes."
+
+================================================================================
+⏱️ SECTION 2: PARKING INTELLIGENCE & GEOSPATIAL CLUSTERING (0:35 - 1:15)
+--------------------------------------------------------------------------------
+🖥️ SCREEN ACTION (क्या करना है):
+1. Click on "Parking Intelligence" in the left sidebar.
+2. Wait for the density map to load, and point to the dense colored cluster hotspots.
+3. Scroll down to show the "Future Hotspot Prediction" forecasting charts and the rolling lags table.
+
+🗣️ SPEECH SCRIPT (क्या बोलना है):
+"Now, let's open the Parking Intelligence tab. 
+
+To detect illegal parking hotspots, our backend ingests raw coordinates from 298,450 police violation records. We process this spatial data using DBSCAN density clustering with parameters set at epsilon equals 110 meters and min samples of 3. These parameters are mathematically calibrated to represent average street block lengths and parking slot widths in commercial areas, effectively filtering out isolated violation events.
+
+To make our enforcement proactive, the identified clusters are fed into an ExtraTrees Regressor. This model leverages rolling lag sequences, historical 3-day and 7-day violation frequencies, and spatial land-use tags to predict future hotspot growth rates over a 7-day lookahead horizon. We also run SHAP game-theoretic explainability to show dispatchers which features drive these forecasts."
+
+================================================================================
+⏱️ SECTION 3: CONGESTION IMPACT & PCU MATH ENGINE (1:15 - 1:55)
+--------------------------------------------------------------------------------
+🖥️ SCREEN ACTION (क्या करना है):
+1. Click on "Congestion Impact" in the left sidebar.
+2. Hover over the vehicle classification charts showing Bikes, Cars, and Trucks.
+3. Point to the "Lane Capacity Blockage" gauges and explain the dynamic multipliers.
+
+🗣️ SPEECH SCRIPT (क्या बोलना है):
+"Let's move to the Congestion Impact tab. 
+
+To quantify the direct delay caused by illegal parking, we developed a Passenger Car Unit—or PCU—blockage engine. We normalize different vehicle classes using standard traffic engineering weights: Two-wheelers count as 0.5 PCUs, Cars as 1.0, and Trucks or Buses as 3.0 PCUs.
+
+By taking the sum of these weights and dividing them by the lane width factor, our engine calculates the percentage of lane capacity lost. This is adjusted by a peak multiplier during rush hours to output a dynamic Congestion Score from 0 to 100. This enables traffic authorities to prioritize zones based on actual road blockage rather than simple violation counts."
+
+================================================================================
+⏱️ SECTION 4: SMART ENFORCEMENT SIMULATOR & CSV EXPORT (1:55 - 2:35)
+--------------------------------------------------------------------------------
+🖥️ SCREEN ACTION (क्या करना है):
+1. Click on "Enforcement Strategy" in the left sidebar.
+2. Drag the "Additional Officers" slider from 0 to 5. Point to the expected violation reduction and capacity clearance curves updating live.
+3. Click the "Export Recommendations (CSV)" button at the top right header, and point to the downloaded file.
+
+🗣️ SPEECH SCRIPT (क्या बोलना है):
+"Next, in the Enforcement Strategy tab, we translate predictions into active field deployment. 
+
+In this Smart Enforcement Studio, dispatchers can run what-if simulation scenarios. By adjusting the number of officers allocated to a hotspot, the system uses a logarithmic clearance curve—where expected clearance equals the natural log of officers plus 1 multiplied by a calibration coefficient. This mathematically models the diminishing returns of human resource scaling.
+
+Once optimized, the dispatcher clicks the 'Export Recommendations' button to instantly download a structured, field-ready CSV report containing priority zones, officer numbers, and expected clearance targets for immediate squad dispatch."
+
+================================================================================
+⏱️ SECTION 5: LOCAL AI COPILOT & PORTABILITY (2:35 - 3:00)
+--------------------------------------------------------------------------------
+🖥️ SCREEN ACTION (क्या करना है):
+1. Click the floating blue "AI Parking Copilot" chat bubble in the bottom right.
+2. Type: 'Which area needs action right now?' in the chat input and click Send.
+3. Show the local Ollama LLM response rendering in real-time on screen.
+4. Conclude by showing the Docker-Compose.yml file or showing the terminal.
+
+🗣️ SPEECH SCRIPT (क्या बोलना है):
+"Finally, we have our local, privacy-first AI Parking Copilot. 
+
+Because city operations require strict data security, we avoid public cloud APIs. The Copilot runs 100% offline using a local Ollama service running Llama 3.2 1B. It automatically injects live database stats into the prompt, allowing operators to chat naturally and get immediate, structured reports. 
+
+The entire platform is fully containerized and deploys with a single 'docker-compose up --build' command. TrafficAI is secure, portable, and engineered to keep smart cities moving. Thank you!"

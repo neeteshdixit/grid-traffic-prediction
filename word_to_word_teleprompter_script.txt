@@ -1,0 +1,49 @@
+=== TRAFFICAI: WORD-TO-WORD TELEPROMPTER PITCH SCRIPT ===
+(Total Target Duration: 3 Minutes / 180 Seconds. 60 Seconds per Speaker.)
+(Tips: Speak confidently, maintain a steady pace, and don't rush.)
+
+--------------------------------------------------------------------------------
+🎙️ SPEAKER 1: INTRODUCTION & CHALLENGE (0:00 - 1:00)
+[Visual: Displaying cover slide or showing the Overview Dashboard on screen]
+
+"Hello judges, we are Team [Team Name], and today we are presenting TrafficAI—a unified traffic demand forecasting and parking congestion intelligence platform. 
+
+For Round 2, we are directly tackling the critical smart city challenge of: 'Poor Visibility on Parking-Induced Congestion'. 
+
+On-street illegal parking and spillover chokes major lanes and intersections. Traditional enforcement is patrol-based and reactive, leaving authorities completely blind to which parking violations actually cause the most severe traffic bottlenecks.
+
+TrafficAI solves this. If we look at our Overview Dashboard on the screen, the system integrates our Round 1 timeseries demand forecasting framework—powered by our LightGBM Champion model with a validation score of 0.7588—with our new Round 2 parking intelligence pipeline. 
+
+By merging macro traffic demand forecasts with micro-level parking density clustering, we give city managers and traffic police a single pane of glass to predict, quantify, and resolve traffic choke points before they lock up the city. 
+
+Now, our ML lead will explain how our predictive engines and congestion impact models work."
+
+--------------------------------------------------------------------------------
+🎙️ SPEAKER 2: MACHINE LEARNING & CONGESTION MATH (1:00 - 2:00)
+[Visual: Navigator clicks on the 'Parking Intelligence' tab, showing the hotspot map, then scrolls to charts, then clicks the 'Congestion Impact' tab]
+
+"Thank you. Our analytical backend uses a high-performance, dual-model pipeline. 
+
+For Round 2, we ingest raw coordinate data of 298,450 violations. We run a spatial DBSCAN density clustering algorithm with an epsilon of 110 meters and min samples of 3. This filters out random spatial noise and groups scattered illegal parking points into precise, recurring coordinate hotspots.
+
+To make our response proactive rather than reactive, we feed these clusters into an ExtraTrees Regressor. This model uses rolling lag sequences to forecast the growth rate and future violation frequency of each hotspot over a 7-day horizon, showing operators which bottlenecks will expand. We also output SHAP values to explain the key features driving the forecast.
+
+To translate these violations into real-world traffic delays, we developed a Passenger Car Unit (PCU) blockage formula. We weight vehicles dynamically—Bikes count as 0.5, Cars as 1.0, and Trucks as 3.0. Combined with road width ratios, our Congestion Impact Engine calculates the exact lane capacity blockage, outputting a dynamic Congestion Score from 0 to 100 to rank hotspot priorities.
+
+Now, our systems engineer will show how dispatchers use this data to take action."
+
+--------------------------------------------------------------------------------
+🎙️ SPEAKER 3: SIMULATOR, SECURE COPILOT & DEPLOYMENT (2:00 - 3:00)
+[Visual: Navigator clicks on 'Enforcement Strategy', drags the slider, clicks 'Export Recommendations', then opens the AI Copilot chat bubble and types a query, and finally shows docker-compose.yml code]
+
+"Thank you. In the Smart Enforcement Studio, we translate predictions into active field deployment. 
+
+As you can see on screen, dispatchers can use our interactive what-if simulator slider. By adjusting the number of officers allocated to a hotspot, the system uses a logarithmic clearance curve to instantly predict the expected percentage of capacity recovery. 
+
+Once optimized, the dispatcher can click 'Export Recommendations' to download a structured, field-ready CSV report for deployment.
+
+To assist dispatchers in fast decision-making, we integrated a local, privacy-first AI Parking Copilot. Because city operations require strict data security, we avoid public cloud APIs. The Copilot runs 100% offline, connecting to a local Ollama service running Llama 3.2 1B. It automatically injects live database stats into the prompt, allowing operators to chat naturally, asking questions like: 'Which area needs action right now?' and getting immediate, structured markdown reports.
+
+Finally, the entire stack is enterprise-ready. A single 'docker-compose up --build' command spins up our Next.js frontend, FastAPI backend, and indexed MongoDB database in isolated containers. 
+
+TrafficAI is secure, portable, and engineered to keep smart cities moving. Thank you!"

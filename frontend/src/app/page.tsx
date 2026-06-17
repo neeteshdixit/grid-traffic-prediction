@@ -51,7 +51,7 @@ export default function Home() {
       
       if (!activeToken) {
         try {
-          const loginRes = await fetch('http://localhost:8000/api/v1/auth/login', {
+          const loginRes = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: 'admin@traffic.ai', password: 'SecurePassword123!' }),
@@ -82,7 +82,7 @@ export default function Home() {
       }
 
       try {
-        const res = await fetch('http://localhost:8000/api/v1/auth/me', {
+        const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1/auth/me', {
           headers: { Authorization: `Bearer ${activeToken}` },
         });
 
