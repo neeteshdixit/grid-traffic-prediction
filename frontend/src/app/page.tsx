@@ -101,9 +101,9 @@ export default function Home() {
         console.error('Authentication handshake failed:', error);
         // Fallback to mock profile if network error occurs to guarantee page loads
         setUser({
-          _id: 'mock-admin-id',
+          id: 'mock-admin-id',
           email: 'admin@traffic.ai',
-          name: 'System Administrator',
+          full_name: 'System Administrator',
           role: 'admin',
         });
         if (currentPage === 'landing' || currentPage === 'login') {
