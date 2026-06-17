@@ -69,9 +69,9 @@ export default function Home() {
       if (!activeToken) {
         // Fallback: set mock user to prevent lockouts if backend isn't running
         setUser({
-          _id: 'mock-admin-id',
+          id: 'mock-admin-id',
           email: 'admin@traffic.ai',
-          name: 'System Administrator',
+          full_name: 'System Administrator',
           role: 'admin',
         });
         if (currentPage === 'landing' || currentPage === 'login') {
