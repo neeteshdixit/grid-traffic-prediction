@@ -657,6 +657,35 @@ def query_ollama(model: str, system_prompt: str, user_prompt: str) -> Optional[s
     return None
 
 
+def query_gemini(prompt: str, user_message: str) -> Optional[str]:
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return None
+    try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+        headers = {"Content-Type": "application/json"}
+        payload = {
+            "contents": [{
+                "parts": [{
+                    "text": f"{prompt}\n\nUser: {user_message}"
+                }]
+            }]
+        }
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=10.0) as response:
+            if response.status == 200:
+                res_data = json.loads(response.read().decode())
+                return res_data["candidates"][0]["content"]["parts"][0]["text"].strip()
+    except Exception as e:
+        print(f"Gemini API call failed: {e}")
+    return None
+
+
 @router.post("/copilot/chat")
 def copilot_chat(
     payload: CopilotChatRequest,
@@ -665,37 +694,42 @@ def copilot_chat(
 ):
     msg = payload.message.lower()
     
-    # 1. Try Local Ollama Integration
-    ollama_model = get_ollama_model()
-    if ollama_model:
-        try:
-            total_hotspots = db.parking_hotspots.count_documents({})
-            total_violations_res = list(db.parking_hotspots.aggregate([{"$group": {"_id": None, "total": {"$sum": "$total_violations"}}}]))
-            total_violations_count = total_violations_res[0]["total"] if total_violations_res else 298450
+    # Pre-calculate stats and context for all engines
+    try:
+        total_hotspots = db.parking_hotspots.count_documents({})
+        total_violations_res = list(db.parking_hotspots.aggregate([{"$group": {"_id": None, "total": {"$sum": "$total_violations"}}}]))
+        total_violations_count = total_violations_res[0]["total"] if total_violations_res else 298450
+        
+        avg_stats = list(db.parking_hotspots.aggregate([
+            {"$group": {
+                "_id": None,
+                "avg_score": {"$avg": "$congestion_score"},
+                "avg_reduction": {"$avg": "$road_capacity_reduction"}
+            }}
+        ]))
+        avg_congestion_score = avg_stats[0]["avg_score"] if avg_stats else 45.0
+        avg_road_reduction = avg_stats[0]["avg_reduction"] if avg_stats else 30.0
+        
+        critical_docs = list(db.parking_hotspots.find().sort("congestion_score", -1).limit(5))
+        critical_txt = ""
+        for idx, doc in enumerate(critical_docs):
+            critical_txt += f"- {doc['location']} (Junction: {doc['junction_name']}): Congestion Score {doc['congestion_score']}/100, Capacity Reduction {doc['road_capacity_reduction']}%, Main violation: {doc['predominant_violation']}\n"
             
-            avg_stats = list(db.parking_hotspots.aggregate([
-                {"$group": {
-                    "_id": None,
-                    "avg_score": {"$avg": "$congestion_score"},
-                    "avg_reduction": {"$avg": "$road_capacity_reduction"}
-                }}
-            ]))
-            avg_congestion_score = avg_stats[0]["avg_score"] if avg_stats else 45.0
-            avg_road_reduction = avg_stats[0]["avg_reduction"] if avg_stats else 30.0
-            
-            critical_docs = list(db.parking_hotspots.find().sort("congestion_score", -1).limit(5))
-            critical_txt = ""
-            for idx, doc in enumerate(critical_docs):
-                critical_txt += f"- {doc['location']} (Junction: {doc['junction_name']}): Congestion Score {doc['congestion_score']}/100, Capacity Reduction {doc['road_capacity_reduction']}%, Main violation: {doc['predominant_violation']}\n"
-                
-            emerging_docs = list(db.parking_hotspots.find({"category": "Emerging Hotspot"}).sort("growth_rate", -1).limit(3))
-            if not emerging_docs:
-                emerging_docs = list(db.parking_hotspots.find().sort("growth_rate", -1).limit(3))
-            emerging_txt = ""
-            for doc in emerging_docs:
-                emerging_txt += f"- {doc['location']}: Growth rate {doc['growth_rate']:.2f}x, Hotspot Score {doc['hotspot_score']}/100, Category: {doc['category']}\n"
-                
-            system_prompt = f"""You are the AI Parking Copilot, a senior smart city advisor for the Bengaluru Traffic Police.
+        emerging_docs = list(db.parking_hotspots.find({"category": "Emerging Hotspot"}).sort("growth_rate", -1).limit(3))
+        if not emerging_docs:
+            emerging_docs = list(db.parking_hotspots.find().sort("growth_rate", -1).limit(3))
+        emerging_txt = ""
+        for doc in emerging_docs:
+            emerging_txt += f"- {doc['location']}: Growth rate {doc['growth_rate']:.2f}x, Hotspot Score {doc['hotspot_score']}/100, Category: {doc['category']}\n"
+    except Exception:
+        total_hotspots = 350
+        total_violations_count = 219779
+        avg_congestion_score = 45.0
+        avg_road_reduction = 30.0
+        critical_txt = "- Wilson Garden Junction: Congestion Score 87/100, Capacity Reduction 37%, Main violation: Wrong Parking\n"
+        emerging_txt = "- Koramangala 80 Feet Road: Growth rate 1.45x, Hotspot Score 78/100, Category: Emerging Hotspot\n"
+
+    system_prompt = f"""You are the AI Parking Copilot, a senior smart city advisor for the Bengaluru Traffic Police.
 You have access to the following real-world parking violation data computed by our ML models:
 
 [AGGREGATE METRICS]
@@ -717,11 +751,31 @@ You have access to the following real-world parking violation data computed by o
 
 Instructions:
 1. If the user's message is a simple greeting (e.g. 'hlo', 'hello', 'hi', 'hey'), respond with a short, polite greeting welcoming them to the console and ask how you can help them optimize traffic today. Do not output the hotspot tables.
-2. Otherwise, answer the user's question clearly and professionally using the data provided above.
-3. Be direct and avoid generic fluff. Refer to specific streets, junctions, and statistics.
-4. If they ask about deployment, summarize where to send officers and expected improvements.
-5. Keep your responses concise, action-oriented, and formatted in clean markdown.
+2. Otherwise, answer the user's question clearly, conversationally, and professionally in the same language as the user (English or Hindi/Hinglish). Use the data provided above to back up your points where relevant.
+3. If they ask anything off-topic or personal, respond politely as a helpful AI assistant while maintaining a positive and encouraging tone, and gently nudge them back to traffic planning.
+4. Keep your responses concise, action-oriented, and formatted in clean markdown.
 """
+
+    # 1. Try Google Gemini API (if key is set)
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if gemini_key:
+        gemini_response = query_gemini(system_prompt, payload.message)
+        if gemini_response:
+            log_audit(
+                db,
+                current_user["_id"],
+                "COPILOT_CHAT_GEMINI",
+                f"Gemini chat: '{payload.message[:50]}...'"
+            )
+            return {
+                "reply": gemini_response,
+                "timestamp": datetime.utcnow()
+            }
+
+    # 2. Try Local Ollama Integration
+    ollama_model = get_ollama_model()
+    if ollama_model:
+        try:
             ollama_response = query_ollama(ollama_model, system_prompt, payload.message)
             if ollama_response:
                 log_audit(
@@ -737,30 +791,13 @@ Instructions:
         except Exception as ex:
             print(f"Error executing Ollama pipeline: {ex}")
 
-    # 2. Smart Conversational Rule-Based Engine if Ollama is Offline
+    # 3. Smart Conversational Rule-Based Engine (Fallback)
     response_text = ""
-    try:
-        total_hotspots = db.parking_hotspots.count_documents({})
-        total_violations_res = list(db.parking_hotspots.aggregate([{"$group": {"_id": None, "total": {"$sum": "$total_violations"}}}]))
-        total_violations_count = total_violations_res[0]["total"] if total_violations_res else 298450
-        
-        avg_stats = list(db.parking_hotspots.aggregate([
-            {"$group": {
-                "_id": None,
-                "avg_score": {"$avg": "$congestion_score"},
-                "avg_reduction": {"$avg": "$road_capacity_reduction"}
-            }}
-        ]))
-        avg_congestion_score = avg_stats[0]["avg_score"] if avg_stats else 45.0
-        avg_road_reduction = avg_stats[0]["avg_reduction"] if avg_stats else 30.0
-    except Exception:
-        total_hotspots = 350
-        total_violations_count = 219779
-        avg_congestion_score = 45.0
-        avg_road_reduction = 30.0
-
     if "action" in msg or "critical" in msg or "worst" in msg or "congest" in msg:
-        docs = list(db.parking_hotspots.find().sort("congestion_score", -1).limit(3))
+        try:
+            docs = list(db.parking_hotspots.find().sort("congestion_score", -1).limit(3))
+        except Exception:
+            docs = []
         if docs:
             response_text = "Based on our AI Congestion Impact Engine, the top areas requiring immediate action in Bengaluru are:\n\n"
             for i, doc in enumerate(docs):
@@ -773,9 +810,12 @@ Instructions:
             response_text = "I couldn't find any critical hotspots in the database. Please ensure the parking dataset has been processed."
             
     elif "growing" in msg or "emerge" in msg or "fastest" in msg or "trend" in msg:
-        docs = list(db.parking_hotspots.find({"category": "Emerging Hotspot"}).sort("growth_rate", -1).limit(3))
-        if not docs:
-            docs = list(db.parking_hotspots.find().sort("growth_rate", -1).limit(3))
+        try:
+            docs = list(db.parking_hotspots.find({"category": "Emerging Hotspot"}).sort("growth_rate", -1).limit(3))
+            if not docs:
+                docs = list(db.parking_hotspots.find().sort("growth_rate", -1).limit(3))
+        except Exception:
+            docs = []
             
         if docs:
             response_text = "Here are the fastest growing or emerging parking violation hotspots detected recently:\n\n"
@@ -789,7 +829,10 @@ Instructions:
             response_text = "I couldn't find any emerging hotspots in the database. All hotspots seem to have stable historical rates."
             
     elif "officer" in msg or "deploy" in msg or "tomorrow" in msg or "next week" in msg:
-        docs = list(db.parking_hotspots.find().sort("congestion_score", -1).limit(5))
+        try:
+            docs = list(db.parking_hotspots.find().sort("congestion_score", -1).limit(5))
+        except Exception:
+            docs = []
         if docs:
             total_officers = sum(doc.get("suggested_officers", 1) for doc in docs)
             response_text = f"Suggested enforcement deployment strategy for tomorrow/next week:\n\n" \
@@ -821,13 +864,32 @@ Instructions:
     elif any(x in msg for x in ["bengaluru", "bangalore", "location", "place"]):
         response_text = f"Our spatial analysis covers real-world parking violations across Bengaluru, India. Currently, we monitor **{total_hotspots} active hotspots** (such as Wilson Garden, Koramangala, etc.) to optimize traffic flow."
 
+    elif any(x in msg for x in ["padhne", "study", "boring", "bore", "mann nahi", "mann nhi", "lazy", "tired", "mood"]):
+        response_text = "अरे भाई! पढ़ाई और काम से ब्रेक लेना भी ज़रूरी है। थोड़ी देर टहलो, चाय/कॉफ़ी पियो, ताज़ी हवा लो, और फिर फ्रेश माइंड से वापस आओ। तब तक, बेंगलुरु के ट्रैफ़िक को ठीक करने का काम मुझ पर छोड़ दो! 🚦☕😊"
+
+    elif any(x in msg for x in ["bye", "tata", "see you", "exit", "chalta hu"]):
+        response_text = "Goodbye! Safe travels. Remember to park responsibly and always obey traffic rules in Bengaluru! 🚘🚦"
+
+    elif any(x in msg for x in ["joke", "funny", "hansa", "mzak", "mazak"]):
+        response_text = "यहाँ बेंगलुरु में सबसे बड़ा मज़ाक तो यहाँ का सिल्क बोर्ड (Silk Board) ट्रैफ़िक है! 😂 खैर, ट्रैफ़िक रूल्स का पालन करें ताकि पुलिस वाले आपको 'फ्री चालान' का गिफ्ट न दें। 👮‍♂️"
+
     else:
-        response_text = f"I understand you are asking about: *'{payload.message}'*. As your AI Parking Copilot, I can report that Bengaluru currently has **{total_hotspots} active wrong-parking hotspots** with an average road capacity blockage of **{avg_road_reduction:.1f}%**.\n\n" \
-                         f"You can ask me specific questions such as:\n" \
-                         f"- *Which area needs action right now?*\n" \
-                         f"- *Which hotspot is growing fastest?*\n" \
-                         f"- *Where should officers be deployed tomorrow?*"
-                         
+        # Check if the user is asking in Hindi (using common Roman-Hindi words)
+        is_hindi = any(x in msg for x in ["kya", "kaise", "hai", "hu", "nhi", "nahi", "tum", "aap", "bhai"])
+        if is_hindi:
+            response_text = f"मैं समझ सकता हूँ कि आप कुछ पूछ रहे हैं। बेंगलुरु में अभी **{total_hotspots} पार्किंग हॉटस्पॉट** हैं और यहाँ औसत सड़क क्षमता में **{avg_road_reduction:.1f}% की कमी** देखी गई है।\n\n" \
+                             f"आप मुझसे ये सवाल पूछ सकते हैं:\n" \
+                             f"- *Which area needs action right now?* (अभी कार्रवाई की ज़रूरत कहाँ है?)\n" \
+                             f"- *Which hotspot is growing fastest?* (सबसे तेज़ी से बढ़ता हॉटस्पॉट कौन सा है?)\n" \
+                             f"- *Where should officers be deployed tomorrow?* (कल पुलिस कहाँ तैनात करें?)"
+        else:
+            response_text = f"I understand you are asking about: *'{payload.message}'*. As your AI Parking Copilot, I can report that Bengaluru currently has **{total_hotspots} active wrong-parking hotspots** with an average road capacity blockage of **{avg_road_reduction:.1f}%**.\n\n" \
+                             f"For the best conversational experience, consider adding a free **`GEMINI_API_KEY`** in the server environment variables!\n\n" \
+                             f"In the meantime, you can ask me:\n" \
+                             f"- *Which area needs action right now?*\n" \
+                             f"- *Which hotspot is growing fastest?*\n" \
+                             f"- *Where should officers be deployed tomorrow?*"
+                             
     log_audit(
         db,
         current_user["_id"],
