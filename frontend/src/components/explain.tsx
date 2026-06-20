@@ -32,7 +32,7 @@ export default function Explain() {
         }
 
         // Global SHAP
-        const resShap = await fetch(`http://localhost:8000/api/v1/explain/shap/global?model_id=${targetModel?.id || 'champion'}`, {
+        const resShap = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + `/api/v1/explain/shap/global?model_id=${targetModel?.id || 'champion'}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const shapData = await resShap.json();
@@ -58,7 +58,7 @@ export default function Explain() {
     async function fetchLocalShap() {
       try {
         const timeStr = `${selectedTime}:00`;
-        const res = await fetch(`http://localhost:8000/api/v1/explain/shap/local?model_id=${model?.id || 'champion'}&geohash=${selectedGeohash}&timestamp=${timeStr}`, {
+        const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + `/api/v1/explain/shap/local?model_id=${model?.id || 'champion'}&geohash=${selectedGeohash}&timestamp=${timeStr}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();

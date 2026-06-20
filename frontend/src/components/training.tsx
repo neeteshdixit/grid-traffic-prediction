@@ -103,7 +103,7 @@ export default function Training() {
     const interval = setInterval(async () => {
       tick++;
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/training/status/${expId}`, {
+        const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + `/api/v1/training/status/${expId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const exp = await res.json();
