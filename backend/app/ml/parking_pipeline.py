@@ -208,6 +208,17 @@ class ParkingMLPipeline:
             # Expected Improvement (%)
             exp_improvement = min(45, int(15 + officers * 6 + (10 if category == "Emerging Hotspot" else 0)))
             
+            # Generate transparent explainable reason
+            reasons = []
+            if junction_name != "No Junction":
+                reasons.append(f"Located near high-risk intersection ({junction_name}).")
+            if road_reduction > 25:
+                reasons.append(f"Reduces traffic capacity by {round(road_reduction, 1)}%.")
+            if growth_rate > 1.4:
+                reasons.append(f"Violation growth is up {round(growth_rate, 1)}x.")
+            reasons.append(f"Primary issue: {predominant_v.replace('_', ' ').title()}.")
+            explainable_reason = " ".join(reasons)
+
             hotspots.append({
                 "cluster_id": int(c),
                 "latitude": lat_center,
@@ -230,7 +241,8 @@ class ParkingMLPipeline:
                 "congestion_level": congestion_level,
                 "enforcement_priority": priority_rank,
                 "suggested_officers": officers,
-                "expected_improvement_pct": exp_improvement
+                "expected_improvement_pct": exp_improvement,
+                "explainable_reason": explainable_reason
             })
             
         return hotspots

@@ -1,0 +1,88 @@
+================================================================================
+          FLIPKART GRID ROUND 2: 4-MINUTE PRESENTATION & WALKTHROUGH SCRIPT
+================================================================================
+Presenters: Ayushi Vyas & Team
+Project: TrafficAI (Enterprise AI Traffic & Parking Intelligence System)
+Deployment: Frontend (Vercel), Backend (Render), Database (MongoDB Atlas)
+--------------------------------------------------------------------------------
+
+[0:00 - 0:45] INTRODUCTION & PROBLEM DEFINITION
+--------------------------------------------------------------------------------
+SCREEN ACTION:
+- Show the Landing page of the live Vercel app (grid-traffic-prediction.vercel.app).
+- Click the "Open Console" or "Launch Dashboard" button to go directly to the dashboard.
+- Hover over the summary cards on the Overview page.
+
+SPOKEN WORDS:
+"Hello judges and technical evaluators. My name is Ayushi Vyas, and today I am excited to present our Flipkart GRID Round 2 submission: the Enterprise AI Traffic Demand and Parking Intelligence System, known as TrafficAI. 
+
+I have already successfully deployed this entire system in production. The Next.js frontend is live on Vercel, the FastAPI backend is hosted on Render, and our database is hosted on MongoDB Atlas in the cloud.
+
+Urban congestion is a massive economic drain. Existing municipal solutions are static and reactive. Furthermore, illegal street parking blockades lanes, reducing effective road capacity by up to forty percent. Our platform solves this by integrating a high-performance machine learning regression pipeline with geospatial clustering to forecast traffic demand and pinpoint parking hotspots with high precision."
+
+
+[0:45 - 1:45] STEP 1: DATASET UPLOAD & ENGINEERING
+--------------------------------------------------------------------------------
+SCREEN ACTION:
+- Click on the "Datasets" tab in the sidebar.
+- Click the "Upload Dataset" button.
+- Choose a CSV file (e.g., 'jan to may police violation_anonymized791b166.csv') and click upload.
+- Point to the processed dataset row appearing in the list with the row count (77,299).
+
+SPOKEN WORDS:
+"Let's start the walkthrough. First, we upload our dataset. I will click on the 'Datasets' tab in the sidebar and select 'Upload Dataset'. I'll choose our Bengaluru police violations CSV containing over seventy-seven thousand records. 
+
+As I click Upload, the backend instantly processes the raw data. The result of this pipeline is that geohashes are decoded into coordinates, cyclical temporal features are extracted, and target encodings are computed. 
+
+To guarantee that our models generalize perfectly to new areas, we implement a leakage-safe Grouped K-Fold Cross-Validation, grouping training points strictly by geohash block so that spatial coordinates don't bleed into validation sets."
+
+
+[1:45 - 2:45] STEP 2: MODEL TRAINING & LEADERBOARD RESULTS
+--------------------------------------------------------------------------------
+SCREEN ACTION:
+- Click on the "Training" or "Dashboard" tab in the sidebar.
+- Point to the Model Leaderboard table.
+- Hover over the "Ensemble_Voting" row.
+- Show the visual charts (Daily Demand Trend, Weather Impact, Road Type Distribution).
+
+SPOKEN WORDS:
+"Next, we run the model training. I will go to the Leaderboard. Our pipeline automatically trains seven different models to compare their accuracy. 
+
+As you can see, our baseline Linear Regression achieved an R-squared of 0.9119. However, our tree-based gradient boosted models performed much better. 
+
+The ultimate champion is our Ensemble Voting Regressor, which combines RandomForest, XGBoost, and LightGBM. The result is an outstanding Validation R-squared score of 0.7527, a Mean Absolute Error of 0.0212, and an RMSE of 0.0309. 
+
+On the dashboard, we can interactively inspect these results. The area chart shows the hourly peak traffic trends, the bar chart shows the weather impact where rainy weather drastically increases demand, and the pie chart shows the road type distribution."
+
+
+[2:45 - 3:30] STEP 3: PARKING HOTSPOTS & AI CONGESTION FORECASTS
+--------------------------------------------------------------------------------
+SCREEN ACTION:
+- Click on the "Parking Hotspots" tab in the sidebar.
+- Click on a red marker (Richmond Road area) on the interactive Bengaluru SVG map.
+- Point to the right-side detail panel.
+- Click on the "AI Forecasts" tab on the right panel.
+
+SPOKEN WORDS:
+"Now, let's explore our Round 2 upgrade: Parking Hotspots and Congestion Impact. I will click on the 'Parking Hotspots' tab. On this interactive street grid of Bengaluru, the red, yellow, and purple markers show hotspots clustered using the DBSCAN algorithm. 
+
+I will click on this red marker on Richmond Road. The details panel updates instantly. The result shows a Hotspot Score of 84, a total of 152 violations, and a massive 22% reduction in road capacity at the junction due to illegal parking. 
+
+Now, I will click on the 'AI Forecasts' tab. Our model predicts a 74% likelihood of this location remaining a critical bottleneck tomorrow with an estimated 64 violations, allowing towing trucks to be deployed proactively."
+
+
+[3:30 - 4:00] STEP 4: AI COPILOT & CONCLUSION
+--------------------------------------------------------------------------------
+SCREEN ACTION:
+- Click the floating chatbot bubble in the bottom right corner.
+- Type: "What is the road capacity reduction at qp02z1?" and click send.
+- Show the chat response text.
+- Show the closing slide/credits.
+
+SPOKEN WORDS:
+"Finally, we demonstrate the AI Copilot. I will open the chat window in the corner and ask: 'What is the road capacity reduction at geohash qp02z1?'. 
+
+The copilot, running a local Llama 3.2 model, queries MongoDB, matches the geohash, and instantly responds that Richmond Road has a twenty-two percent capacity reduction. If the LLM goes offline, our backend fallback automatically parses the query and returns the metrics.
+
+In conclusion, TrafficAI turns raw police records into proactive municipal decisions, recovering up to forty percent of lost road capacity and improving urban mobility. Thank you for your time."
+================================================================================

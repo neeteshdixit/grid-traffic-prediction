@@ -1,0 +1,350 @@
+================================================================================
+     FLIPKART GRID ROUND 2: SYNCED LIVE WALKTHROUGH & PRESENTATION NARRATION
+================================================================================
+File: flipkart_grid_sidebar_narration_script.txt
+Presenters: Ayushi Vyas & Team
+Target Audience: Hackathon Judges, Technical Reviewers, Product Experts
+Narration Language: English (Word-to-Word)
+Click & Interface Instructions: Hindi (Step-by-step)
+================================================================================
+
+================================================================================
+                     INTRODUCTION & LIVE PRODUCTION STATUS
+================================================================================
+
+### What appears on screen
+* Browser windows shows the project landing page (grid-traffic-prediction.vercel.app).
+* Beautiful dark mode layout with glowing elements, metrics cards displaying:
+  - 77,299 Train Rows
+  - 41,778 Test Rows
+  - 1,249 Mapped Geohashes
+  - 5 Model Stages
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Browser window में landing page open रखिये। 
+2. स्क्रीन रिकॉर्डिंग स्टार्ट करिये, cursor को center heading "Predict traffic demand before the gridlock starts" पर hover करिये।
+3. नीचे दिए गए stats cards (Train rows, Geohashes) को cursor से point-out कीजिये।
+4. अब top-right corner में "Open Console" या "Launch Dashboard" button पर click कीजिये, जिससे console dashboard open हो जायेगा।
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Hello judges and technical reviewers. My name is Ayushi Vyas, and today I am excited to present our Flipkart GRID Round 2 submission: TrafficAI, an Enterprise AI Traffic Demand and Parking Intelligence System. 
+
+I have already successfully deployed this entire system in production. The Next.js frontend is live on Vercel at grid-traffic-prediction.vercel.app, the FastAPI backend is hosted on Render, and our database is hosted on MongoDB Atlas in the cloud.
+
+Urban congestion is a massive economic drain. Existing municipal solutions are static and reactive. Furthermore, illegal street parking blockades lanes, reducing effective road capacity by up to forty percent. Our platform solves this by integrating a high-performance machine learning regression pipeline with geospatial clustering to forecast traffic demand and pinpoint parking hotspots with high precision."
+
+================================================================================
+                       SIDEBAR MODULE 1: OVERVIEW DASHBOARD
+================================================================================
+
+### What appears on screen
+* Dashboard header showing "Overview Dashboard" and current system status.
+* 6 KPI metrics cards: Active Model (Ensemble_Voting), Validation R2 (0.7527), MAE (0.0212), RMSE (0.0309), Datasets, and Mapped Geohashes (1,249).
+* Recharts Area Chart showing Daily Demand Trend.
+* Recharts Bar Chart showing Weather Impact.
+* Recharts Pie Chart showing Road Type Distribution.
+* Right sidebar containing High-Risk Geohash Checklist with check status indicators.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Dashboard screen open होने पर, top metrics cards (R2 Score, MAE/RMSE) पर cursor sequentially hover करिये।
+2. नीचे scroll करके "Daily Demand Trend" area chart के points पर pointer ले जाइये।
+3. "Weather Impact" bar chart की individual bars पर cursor drag कीजिये।
+4. Right panel में "High-risk Geohash Checklist" table के first few coordinates को point-out करिये।
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"We are now inside the main console, starting with the Overview Dashboard. At the top of the screen, we track our core KPIs. Our champion model is the Ensemble Voting Regressor, which achieved a Validation R-squared score of 0.7527, with a Mean Absolute Error of 0.0212 and an RMSE of 0.0309. 
+
+Below, the Daily Demand Trend area chart illustrates the cyclical traffic peaks, showing clear spikes during morning and evening rush hours. The Weather Impact bar chart demonstrates how rainy conditions increase the traffic demand score significantly. On the right, the High-Risk Geohash Checklist automatically flags coordinate grids experiencing critical congestion levels, allowing real-time monitoring."
+
+================================================================================
+                       SIDEBAR MODULE 2: PARKING INTELLIGENCE
+================================================================================
+
+### What appears on screen
+* Custom interactive SVG grid map of Bengaluru with coordinates overlayed.
+* Clustered hotspot markers (red for critical, yellow for medium risk).
+* Right-side panel with two tabs: "Details Matrix" and "AI Forecasts".
+* Details Matrix displays: Hotspot Score (84), Road Capacity Reduction (22%), Junction Risk (Critical), and Violation breakdown chart.
+* AI Forecasts displays: Tomorrow Predicted Count (64), Hotspot Probability (74%).
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Left sidebar menu में second option "Parking Intelligence" button पर click कीजिये।
+2. Map load होने पर, central area में Richmond Road के pass red color के critical hotspot marker पर click करिये।
+3. Right panel में "Details Matrix" card के parameters (Capacity Reduction: 22%) को highlight कीजिये।
+4. Panel के top tab click करके "AI Forecasts" screen open कीजिये और tomorrow parameters point-out कीजिये।
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Next, I will open the Parking Intelligence page. This displays our Round 2 specific feature: Parking Hotspots and Congestion Impact. We execute a DBSCAN spatial clustering algorithm to group localized violations. 
+
+When I click on this red marker on Richmond Road, the details panel updates instantly. The hotspot score is 84, and this parking bottleneck causes a 22% reduction in effective road capacity at this junction. 
+
+Switching to the AI Forecasts tab, our model predicts 64 violations tomorrow at this location, with a 74% likelihood of remaining a critical hotspot, enabling proactive towing dispatch."
+
+================================================================================
+                       SIDEBAR MODULE 3: CONGESTION IMPACT
+================================================================================
+
+### What appears on screen
+* Congestion levels metrics table list.
+* Interactive peak hours chart mapping delay severity across time intervals.
+* High risk sectors list indicating active transit delays.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Left sidebar menu में "Congestion Impact" option पर click कीजिये।
+2. Major intersections list पर hover कीजिये।
+3. Peak Hours grid visualizer की colored timeline tiles को point-out करिये।
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Now I will navigate to the Congestion Impact tab. This screen isolates wide-area bottlenecks across the city. We track active congestion levels at major intersections. The list shows junctions ranked by traffic delay, while the peak hours visualizer helps planners map out when bottlenecks build up, allowing signals to be overridden dynamically."
+
+================================================================================
+                       SIDEBAR MODULE 4: ENFORCEMENT STRATEGY
+================================================================================
+
+### What appears on screen
+* Recommended Officer Deployment table with columns: Hotspot, Risk, Officers recommended, Shift, Status, Action.
+* Action button "Deploy Officers" which triggers database logs.
+* Interactive Shift scheduling calendar.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Left sidebar mein "Enforcement Strategy" option par click karein.
+2. Recommended Officer Deployment table par coordinate list aur shift schedules dikhayein.
+3. Top row (Richmond Road hotspot) ke action column mein "Deploy Officers" button par click karein.
+4. Deployment successfully log transaction screen aur MongoDB confirmation point-out karein.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Moving to the Enforcement Strategy module. Our system translates traffic forecasts into direct action. This dashboard recommends the exact officer headcount needed to resolve active congestion. When I click the Deploy button on the Richmond Road hotspot, the dispatch event is logged instantly in MongoDB. This removes guesswork from police scheduling."
+
+================================================================================
+                       SIDEBAR MODULE 5: DATASET STUDIO
+================================================================================
+
+### What appears on screen
+* Drag-and-drop CSV dataset upload area.
+* Table of uploaded datasets showing: Name, Type (Train/Test), Rows count (77,299), Upload time, Status (Processed).
+* Schema columns metadata inspection panels.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Sidebar mein "Dataset Studio" tab par click karein.
+2. Dataset upload drop zone section ko cursor se circular select karke dikhayein.
+3. Neeche tabular datasets list par focus karein aur point-out karein ki 77,299 rows wala training CSV pehle se loaded hai.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Let's explore our Dataset Studio. This is the entry point for all municipal records. Users can drag and drop new violation CSVs here. The backend immediately validates the schema and stores the dataset metadata in MongoDB. As shown in the file list, our active Bengaluru police violations training dataset contains 77,299 records, fully profiled and parsed."
+
+================================================================================
+                       SIDEBAR MODULE 6: FEATURE ENGINEERING
+================================================================================
+
+### What appears on screen
+* Sequential flow diagram illustrating geohash decoding, temporal feature extraction, and target encoding steps.
+* Configuration inputs for geohash base resolutions.
+* Visual preview panel showing the resulting engineered dataset structure.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Sidebar menu mein "Feature Engineering" par click karein.
+2. Spatial decoding grid parameters visual aur dynamic temporal extraction flowcharts par mouse hover karein.
+3. Coordinate values transformation indicators select kijiye.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Now we look at the Feature Engineering interface. This demonstrates how we prepare raw logs for training. We decode geohashes into latitude and longitude coordinates. We also apply sine and cosine transformations to timestamps to model time cyclically, and compute target encodings for coordinates. This clean pipeline prevents training errors and ensures stable predictions."
+
+================================================================================
+                       SIDEBAR MODULE 7: MODEL TRAINING
+================================================================================
+
+### What appears on screen
+* Checklist of models to train (Ridge, Random Forest, XGBoost, LightGBM, Extra Trees, Ensemble Voting).
+* "Train Champion Model" process launcher button.
+* Real-time training stdout console logs panel.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Sidebar mein "Model Training" tab par click karein.
+2. Center panel mein algorithms list checkboxes aur configuration toggles ko hover karke point-out karein.
+3. Green color ke "Train Champion Model" button par pointer le jayein.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Next, we open the Model Training dashboard. Here, we can trigger training across multiple models, including XGBoost, LightGBM, and Random Forest. To prevent spatial data leakage, our pipeline executes a geohash-based Grouped K-Fold split. The system automatically trains, validates, and ranks the models, selecting the best performer as our active champion."
+
+================================================================================
+                       SIDEBAR MODULE 8: PREDICTION CENTER
+================================================================================
+
+### What appears on screen
+* Dropdown fields: Geohash select, Weather condition, Road Type, Day of Week, Hour, Minute.
+* "Generate Forecast" button.
+* Dynamic prediction outcome display showing the forecast demand score value.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Sidebar mein "Prediction Center" tab par click karein.
+2. Form fields select karke input values select kijiye:
+   - Geohash input text box mein "qp02z1" type karein.
+   - Weather select dropdown box mein "Rainy" select karein.
+   - Road Type list mein "Residential" select karein.
+3. Blue button "Generate Forecast" par click kijiye aur side panel mein predicted traffic score result calculate hote hue dikhayein.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Now, I will open the Prediction Center. This allows administrators to perform manual batch scenarios. If I input coordinate geohash 'qp02z1', select Rainy weather, and click Generate Forecast, our active champion ensemble model evaluates the features in milliseconds and outputs a high-precision congestion score."
+
+================================================================================
+                       SIDEBAR MODULE 9: EXPLAINABILITY
+================================================================================
+
+### What appears on screen
+* Horizontal bar chart displaying Global SHAP feature importances.
+* Top features list: Hour, Weather, Day, Geohash Mean.
+* Local factors impact visualization panel.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Sidebar mein "Explainability" tab par click karein.
+2. SHAP feature importance bar graph par cursor drag kijiye.
+3. Top high importance variables (Hour and Weather) ki horizontal bars ko highlight kijiye.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"We are now on the Explainability screen. To build administrative trust, we integrate a SHAP explanation layer. The global importance chart reveals that the hour of the day and weather conditions are the highest contributors to traffic density, ensuring that model predictions are completely transparent."
+
+================================================================================
+                       SIDEBAR MODULE 10: ANALYTICS
+================================================================================
+
+### What appears on screen
+* Bar charts mapping violation breakdown counts (Helmet, triple riding, wrong parking).
+* Dynamic correlation heatmap matrix.
+* Time-series volume comparison cards.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Sidebar mein "Analytics" tab par click karein.
+2. Screen par violation types bar chart ke different category segments select kijiye.
+3. Heatmap blocks par mouse crosshair drag karke values point-out kijiye.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Next, I'll open the Analytics panel. This offers deeper insights into violation patterns. We can observe that while helmet violations have the highest volume in the dataset, wrong parking has the highest correlation with road capacity reduction, highlighting where strict parking guidelines must be enforced."
+
+================================================================================
+                       SIDEBAR MODULE 11: REPORTS
+================================================================================
+
+### What appears on screen
+* Export control blocks (CSV / PDF format selector).
+* "Export PDF Report" button.
+* Logs table of previously generated reports.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Sidebar mein "Reports" tab par click karein.
+2. Report template options select karein.
+3. "Export PDF" button par mouse hover karke point-out kijiye.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Let's check the Reports tab. This module handles report exports for municipal archives. Administrators can download current model comparison metrics and officer dispatch schedules as a print-ready PDF or CSV spreadsheet in one click."
+
+================================================================================
+                       SIDEBAR MODULE 12: SETTINGS
+================================================================================
+
+### What appears on screen
+* API Endpoint path input field.
+* App theme switcher toggles.
+* System configurations settings panel.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Sidebar mein "Settings" tab par click karein.
+2. API URL text entry input field select karein.
+3. Theme mode toggle buttons click karke Dark mode back and forth change karke display check karein.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Now we look at the Settings page. From here, we configure the API endpoint URLs connecting our Next.js frontend to the FastAPI backend. We can also adjust application settings like toggling light and dark modes, ensuring adaptability across server systems."
+
+================================================================================
+                       SIDEBAR MODULE 13: AUDIT LOGS
+================================================================================
+
+### What appears on screen
+* Paginated audit logs list containing columns: Log ID, Action, Target details, IP Address, Timestamp.
+* Column query search filters.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Sidebar mein last item "Audit Logs" par click karein.
+2. Audit list rows scroll kijiye aur action descriptions point out karein.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Finally, we have the Audit Logs, restricted to administrators. This module logs every critical transaction, including dataset uploads and officer dispatches, alongside IP addresses and timestamps. This enforces strict security and transparency across the platform."
+
+================================================================================
+                      CONCLUSION & AI COPILOT INTERACTION
+================================================================================
+
+### What appears on screen
+* Chat bubble window in the bottom-right corner.
+* Natural chat typing window.
+* Custom database query output response.
+
+---
+
+### HINDI ACTION GUIDE (कहाँ क्लिक करना है और क्या करना है):
+1. Screen par right side bottom corner mein floating chat widget bubble bubble par click kijiye.
+2. Text area box select kijiye aur keyboard se type kijiye: "What is the road capacity reduction at qp02z1?".
+3. Send button click karke local chatbot output text check kijiye.
+4. Camera ki taraf deke target summary dialogue boliye.
+
+---
+
+### ENGLISH WORD-TO-WORD NARRATION (क्या बोलना है):
+"Lastly, our AI Copilot chatbot in the corner connects to a local Llama 3.2 model to fetch real-time metrics for natural query requests. In conclusion, TrafficAI delivers a production-ready, data-driven framework to reduce urban gridlock and reclaim lost street lanes. Thank you for your time and evaluation."
+
+================================================================================

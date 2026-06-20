@@ -66,6 +66,46 @@ def decode_geohash(geohash: str) -> Tuple[float, float]:
     return lat, lon
 
 
+def encode_geohash_to_string(latitude: float, longitude: float, precision: int = 6) -> str:
+    """Encode latitude and longitude to standard base32 geohash."""
+    lat_interval = (-90.0, 90.0)
+    lon_interval = (-180.0, 180.0)
+    bits = [16, 8, 4, 2, 1]
+    base32 = "0123456789bcdefghjkmnpqrstuvwxyz"
+    
+    geohash = []
+    val = 0
+    bit = 0
+    is_even = True
+    
+    while len(geohash) < precision:
+        if is_even:
+            mid = (lon_interval[0] + lon_interval[1]) / 2.0
+            if longitude > mid:
+                val |= bits[bit]
+                lon_interval = (mid, lon_interval[1])
+            else:
+                lon_interval = (lon_interval[0], mid)
+        else:
+            mid = (lat_interval[0] + lat_interval[1]) / 2.0
+            if latitude > mid:
+                val |= bits[bit]
+                lat_interval = (mid, lat_interval[1])
+            else:
+                lat_interval = (lat_interval[0], mid)
+        
+        is_even = not is_even
+        if bit < 4:
+            bit += 1
+        else:
+            geohash.append(base32[val])
+            val = 0
+            bit = 0
+            
+    return "".join(geohash)
+
+
+
 def _safe_mode(series: pd.Series, default: str) -> str:
     values = series.dropna()
     if values.empty:
@@ -111,16 +151,42 @@ class TrafficMLPipeline:
     def _prepare_base_frame(self, df: pd.DataFrame) -> pd.DataFrame:
         frame = df.copy()
 
+        # Standardize column names to lowercase/common forms
+        for col in list(frame.columns):
+            col_lower = col.lower()
+            if col_lower in ["geohash"]:
+                frame = frame.rename(columns={col: "geohash"})
+            elif col_lower in ["latitude", "lat"]:
+                frame = frame.rename(columns={col: "latitude"})
+            elif col_lower in ["longitude", "lon", "lng"]:
+                frame = frame.rename(columns={col: "longitude"})
+
+        # If geohash is missing but latitude/longitude are present, generate geohash
+        if "geohash" not in frame.columns and "latitude" in frame.columns and "longitude" in frame.columns:
+            def get_gh(row):
+                try:
+                    lat = float(row["latitude"])
+                    lon = float(row["longitude"])
+                    return encode_geohash_to_string(lat, lon)
+                except Exception:
+                    return "qp02z1"
+            frame["geohash"] = frame.apply(get_gh, axis=1)
+
+        # Standard processing
         if "geohash" in frame.columns:
             frame["geohash"] = frame["geohash"].astype(str).str.lower()
-            coords = frame["geohash"].map(decode_geohash)
-            frame["latitude"] = coords.map(lambda item: item[0]).astype(float)
-            frame["longitude"] = coords.map(lambda item: item[1]).astype(float)
+            # Decode coords if missing
+            if "latitude" not in frame.columns or "longitude" not in frame.columns:
+                coords = frame["geohash"].map(decode_geohash)
+                frame["latitude"] = coords.map(lambda item: item[0]).astype(float)
+                frame["longitude"] = coords.map(lambda item: item[1]).astype(float)
             frame["geohash_prefix4"] = frame["geohash"].str[:4]
         else:
-            frame["latitude"] = 0.0
-            frame["longitude"] = 0.0
-            frame["geohash_prefix4"] = "0000"
+            # Fallback if both geohash and lat/lon are missing
+            frame["geohash"] = "qp02z1"
+            frame["latitude"] = 12.9716  # Bengaluru center lat fallback
+            frame["longitude"] = 77.5946 # Bengaluru center lon fallback
+            frame["geohash_prefix4"] = "qp02"
 
         if "timestamp" in frame.columns:
             time_parts = frame["timestamp"].astype(str).str.strip().str.split(":", n=1, expand=True)

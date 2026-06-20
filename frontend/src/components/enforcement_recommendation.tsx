@@ -36,6 +36,7 @@ interface Hotspot {
   enforcement_priority: string;
   suggested_officers: number;
   expected_improvement_pct: number;
+  explainable_reason?: string;
 }
 
 interface SimulationResult {
@@ -209,48 +210,82 @@ export default function EnforcementRecommendation() {
             <h3 className="text-sm font-bold mb-4">Priority Recommendations</h3>
             
             <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin">
-              {hotspots.slice(0, 10).map((h, i) => (
-                <div
-                  key={h.cluster_id}
-                  onClick={() => setSelectedClusterId(h.cluster_id)}
-                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border p-4 transition cursor-pointer hover:scale-[1.01] ${
-                    selectedClusterId === h.cluster_id
-                      ? (isDark ? 'border-cyan-400/35 bg-cyan-500/10' : 'border-cyan-200 bg-cyan-50')
-                      : (isDark ? 'border-white/5 bg-slate-900/40 hover:bg-slate-900/60' : 'border-slate-200 bg-white hover:bg-slate-100')
-                  }`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider ${
-                        h.enforcement_priority === 'Critical' ? 'bg-rose-500/20 text-rose-300' :
-                        h.enforcement_priority === 'High' ? 'bg-rose-500/10 text-rose-300' :
-                        h.enforcement_priority === 'Medium' ? 'bg-amber-500/10 text-amber-300' : 'bg-emerald-500/10 text-emerald-300'
-                      }`}>
-                        {h.enforcement_priority} Priority
-                      </span>
-                      <span className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>Cluster #{h.cluster_id}</span>
-                    </div>
-                    
-                    <h4 className="text-xs font-bold leading-5 mt-1 truncate">{h.location}</h4>
-                    <p className={`text-[10px] mt-0.5 truncate ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
-                      {h.police_station} station • Junction: {h.junction_name}
-                    </p>
-                  </div>
+              {hotspots.slice(0, 10).map((h, i) => {
+                const explainReason = h.explainable_reason || (() => {
+                  const parts = [];
+                  if (h.junction_name && h.junction_name !== 'No Junction') {
+                    parts.push(`Near intersection ${h.junction_name}.`);
+                  }
+                  if (h.road_capacity_reduction > 25) {
+                    parts.push(`Reduces capacity by ${h.road_capacity_reduction}%.`);
+                  }
+                  if (h.growth_rate > 1.4) {
+                    parts.push(`Growth is accelerating (${h.growth_rate.toFixed(1)}x).`);
+                  }
+                  return parts.join(' ') || 'Elevated vehicle occurrences.';
+                })();
 
-                  <div className="flex items-center gap-4 border-t sm:border-t-0 sm:border-l pt-3 sm:pt-0 sm:pl-4 border-white/10 shrink-0">
-                    <div className="text-left sm:text-center">
-                      <div className="text-[9px] uppercase tracking-wide text-slate-500">Deploy Officers</div>
-                      <div className="flex items-center gap-1 mt-1 text-sm font-bold justify-start sm:justify-center">
-                        <Users size={14} className="text-cyan-300" /> {h.suggested_officers}
+                return (
+                  <div
+                    key={h.cluster_id}
+                    onClick={() => setSelectedClusterId(h.cluster_id)}
+                    className={`flex flex-col gap-3 rounded-2xl border p-4 transition cursor-pointer hover:scale-[1.01] ${
+                      selectedClusterId === h.cluster_id
+                        ? (isDark ? 'border-cyan-400/35 bg-cyan-500/10' : 'border-cyan-200 bg-cyan-50')
+                        : (isDark ? 'border-white/5 bg-slate-900/40 hover:bg-slate-900/60' : 'border-slate-200 bg-white hover:bg-slate-100')
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider ${
+                          isDark ? 'bg-cyan-500/20 text-cyan-300' : 'bg-cyan-100 text-cyan-800'
+                        }`}>
+                          Rank #${i + 1}
+                        </span>
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider ${
+                          h.enforcement_priority === 'Critical' ? 'bg-rose-500/20 text-rose-300' :
+                          h.enforcement_priority === 'High' ? 'bg-rose-500/10 text-rose-300' :
+                          h.enforcement_priority === 'Medium' ? 'bg-amber-500/10 text-amber-300' : 'bg-emerald-500/10 text-emerald-300'
+                        }`}>
+                          {h.enforcement_priority} Priority
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 text-[9px] font-bold tracking-wider">
+                        <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>HOTSPOT: <b className="text-cyan-400">{h.hotspot_score}</b></span>
+                        <span className="text-slate-500">•</span>
+                        <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>CONGESTION: <b className="text-rose-400">{h.congestion_score}</b></span>
                       </div>
                     </div>
-                    <div className="text-left sm:text-center">
-                      <div className="text-[9px] uppercase tracking-wide text-slate-500">Est. Improvement</div>
-                      <div className="text-sm font-black text-cyan-300 mt-1">{h.expected_improvement_pct}%</div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-white/5 pt-2">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-xs font-bold leading-5 truncate">{h.location}</h4>
+                        <p className={`text-[10px] mt-0.5 truncate ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
+                          {h.police_station} station • Junction: {h.junction_name}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-4 shrink-0">
+                        <div>
+                          <div className="text-[9px] uppercase tracking-wide text-slate-500">Deploy Officers</div>
+                          <div className="flex items-center gap-1 mt-1 text-sm font-bold justify-start sm:justify-center">
+                            <Users size={14} className="text-cyan-300" /> {h.suggested_officers}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-[9px] uppercase tracking-wide text-slate-500">Est. Improvement</div>
+                          <div className="text-sm font-black text-cyan-300 mt-1">{h.expected_improvement_pct}%</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={`mt-1 text-[10px] leading-relaxed border-t border-white/5 pt-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      <span className="font-semibold text-cyan-400">Recommendation Basis:</span> {explainReason}
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </Reveal>

@@ -94,6 +94,8 @@ export default function ParkingIntelligence() {
     fetchHotspots();
   }, [token]);
 
+
+
   // Statistics
   const stats = useMemo(() => {
     if (!hotspots.length) return { totalViolations: 0, totalHotspots: 0, criticalCount: 0, avgReduction: 0 };
@@ -119,6 +121,112 @@ export default function ParkingIntelligence() {
       return matchesSearch && matchesCategory;
     });
   }, [hotspots, searchTerm, categoryFilter]);
+
+  useEffect(() => {
+    if (activeTab !== 'map' || filteredHotspots.length === 0) return;
+
+    let mapInstance: any = null;
+
+    const loadLeaflet = async () => {
+      // Inject CSS if not present
+      if (!document.querySelector('link[href*="leaflet.css"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        link.crossOrigin = '';
+        document.head.appendChild(link);
+      }
+
+      // Inject script if not present
+      if (!(window as any).L) {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.crossOrigin = '';
+        await new Promise((resolve) => {
+          script.onload = resolve;
+          document.head.appendChild(script);
+        });
+      }
+
+      const L = (window as any).L;
+      if (!L) return;
+
+      const mapContainer = document.getElementById('leaflet-parking-map');
+      if (!mapContainer) return;
+
+      // Clean up previous map if it exists
+      if ((mapContainer as any)._leaflet_id) {
+        return; // Let the cleanup function or React state handle it
+      }
+
+      // Compute centroid
+      const validHotspots = filteredHotspots.filter(h => h.latitude && h.longitude);
+      if (validHotspots.length === 0) return;
+      const centerLat = validHotspots.reduce((sum, h) => sum + h.latitude, 0) / validHotspots.length;
+      const centerLon = validHotspots.reduce((sum, h) => sum + h.longitude, 0) / validHotspots.length;
+
+      mapInstance = L.map('leaflet-parking-map', {
+        zoomControl: false // position it manually or keep it clean
+      }).setView([centerLat, centerLon], 13);
+
+      L.control.zoom({
+        position: 'bottomright'
+      }).addTo(mapInstance);
+
+      // Dark vs Light Mode tile layers
+      const tileUrl = isDark 
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+      
+      const attribution = isDark
+        ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+
+      L.tileLayer(tileUrl, { attribution, maxZoom: 20 }).addTo(mapInstance);
+
+      // Add markers
+      validHotspots.forEach((h) => {
+        let colorClass = 'bg-cyan-400 ring-cyan-400/30';
+        if (h.category === 'Wrong Parking Hotspot') {
+          colorClass = 'bg-amber-400 ring-amber-400/30';
+        } else if (h.category === 'Emerging Hotspot') {
+          colorClass = 'bg-purple-400 ring-purple-400/30';
+        } else if (h.congestion_level === 'Critical') {
+          colorClass = 'bg-rose-500 ring-rose-500/40';
+        }
+
+        const customIcon = L.divIcon({
+          className: 'custom-leaflet-marker-wrapper',
+          html: `<div class="w-3.5 h-3.5 rounded-full ${colorClass} ring-4 animate-pulse border border-white shadow-md"></div>`,
+          iconSize: [14, 14],
+          iconAnchor: [7, 7]
+        });
+
+        const marker = L.marker([h.latitude, h.longitude], { icon: customIcon }).addTo(mapInstance);
+
+        marker.bindPopup(`
+          <div class="text-slate-900 font-sans p-1 text-[11px] leading-relaxed">
+            <div class="font-bold text-xs border-b pb-1 mb-1 text-slate-800">${h.location}</div>
+            <div>Junction Risk: <span class="font-bold text-rose-600">${h.junction_risk}</span></div>
+            <div>Hotspot Score: <span class="font-bold">${h.hotspot_score}</span></div>
+            <div>Congestion: <span class="font-bold">${h.congestion_level}</span></div>
+          </div>
+        `, { closeButton: false });
+
+        marker.on('click', () => {
+          setSelectedHotspot(h);
+        });
+      });
+    };
+
+    loadLeaflet();
+
+    return () => {
+      if (mapInstance) {
+        mapInstance.remove();
+      }
+    };
+  }, [activeTab, filteredHotspots, isDark]);
 
   // Map limits for custom SVG rendering of Bengaluru
   const mapBounds = useMemo(() => {
@@ -245,22 +353,8 @@ export default function ParkingIntelligence() {
             <Reveal>
               <div className={`relative h-[550px] rounded-3xl border overflow-hidden ${isDark ? 'glass-card-dark bg-slate-950/20' : 'glass-card-light bg-slate-100'}`}>
                 
-                {/* SVG Mock Map Overlay */}
-                <div className="absolute inset-0 opacity-40 select-none">
-                  {/* Grid Lines */}
-                  <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke={isDark ? "rgba(6, 182, 212, 0.15)" : "rgba(15, 23, 42, 0.08)"} strokeWidth="1" />
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)" />
-                    {/* Fake major roads */}
-                    <path d="M 0,200 Q 250,150 500,350 T 1000,300" fill="none" stroke={isDark ? "rgba(6, 182, 212, 0.25)" : "rgba(37, 99, 235, 0.15)"} strokeWidth="3" />
-                    <path d="M 200,0 C 350,250 150,450 400,600" fill="none" stroke={isDark ? "rgba(139, 92, 246, 0.2)" : "rgba(139, 92, 246, 0.15)"} strokeWidth="2.5" />
-                    <path d="M 600,0 Q 550,250 800,600" fill="none" stroke={isDark ? "rgba(6, 182, 212, 0.2)" : "rgba(37, 99, 235, 0.12)"} strokeWidth="2" />
-                  </svg>
-                </div>
+                {/* Leaflet Geospatial Map Container */}
+                <div id="leaflet-parking-map" className="absolute inset-0 w-full h-full z-10" />
 
                 {/* Filters */}
                 <div className="absolute top-4 left-4 right-4 z-20 flex flex-col gap-2 sm:flex-row">
@@ -272,7 +366,7 @@ export default function ParkingIntelligence() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className={`w-full rounded-2xl border px-9 py-2 text-sm ${
-                        isDark ? 'border-white/10 bg-slate-900/60 text-slate-200 focus:border-cyan-400/30' : 'border-slate-200 bg-white text-slate-950 focus:border-cyan-500'
+                        isDark ? 'border-white/10 bg-slate-900/60 text-slate-205 focus:border-cyan-400/30' : 'border-slate-200 bg-white text-slate-950 focus:border-cyan-500'
                       }`}
                     />
                   </div>
@@ -280,7 +374,7 @@ export default function ParkingIntelligence() {
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
                     className={`rounded-2xl border px-4 py-2 text-sm ${
-                      isDark ? 'border-white/10 bg-slate-900/60 text-slate-200 focus:border-cyan-400/30' : 'border-slate-200 bg-white text-slate-950 focus:border-cyan-500'
+                      isDark ? 'border-white/10 bg-slate-900/60 text-slate-205 focus:border-cyan-400/30' : 'border-slate-200 bg-white text-slate-950 focus:border-cyan-500'
                     }`}
                   >
                     <option value="All">All Hotspot Types</option>
@@ -288,39 +382,6 @@ export default function ParkingIntelligence() {
                     <option value="Wrong Parking Hotspot">Wrong Parking</option>
                     <option value="Emerging Hotspot">Emerging Hotspots</option>
                   </select>
-                </div>
-
-                {/* Hotspot Markers */}
-                <div className="absolute inset-0 z-10 pt-16 pb-4 px-4">
-                  <div className="relative w-full h-full">
-                    {filteredHotspots.slice(0, 150).map((h) => {
-                      const pos = getSvgCoordinates(h.latitude, h.longitude);
-                      const isSelected = selectedHotspot?.cluster_id === h.cluster_id;
-                      
-                      // Marker color
-                      let markerColor = 'bg-cyan-400 shadow-cyan-400/40';
-                      if (h.category === 'Wrong Parking Hotspot') {
-                        markerColor = 'bg-amber-400 shadow-amber-400/40';
-                      } else if (h.category === 'Emerging Hotspot') {
-                        markerColor = 'bg-purple-400 shadow-purple-400/40';
-                      } else if (h.congestion_level === 'Critical') {
-                        markerColor = 'bg-rose-500 shadow-rose-500/50';
-                      }
-
-                      return (
-                        <button
-                          key={h.cluster_id}
-                          onClick={() => setSelectedHotspot(h)}
-                          style={{ left: pos.x, top: pos.y }}
-                          className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full p-0.5 transition hover:scale-125 z-10 ${
-                            isSelected ? 'ring-4 ring-cyan-400/40 scale-125 z-20' : ''
-                          }`}
-                        >
-                          <div className={`h-3 w-3 rounded-full shadow-lg ${markerColor} animate-pulse`} />
-                        </button>
-                      );
-                    })}
-                  </div>
                 </div>
 
                 <div className="absolute bottom-4 left-4 z-20 flex gap-4 rounded-xl border border-white/10 bg-slate-950/70 p-3 text-[10px] font-semibold tracking-wider text-slate-300 backdrop-blur-md">

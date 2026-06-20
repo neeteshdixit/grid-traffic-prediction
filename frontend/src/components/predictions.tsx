@@ -41,6 +41,30 @@ export default function Predictions() {
     }
   };
 
+  const handleDownloadPredictions = async (predId: string) => {
+    try {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + `/api/v1/predictions/download/${predId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `demand_predictions_${predId.slice(0, 8)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert("Failed to download predictions file.");
+      }
+    } catch (err) {
+      console.error("Error downloading file:", err);
+      alert("Error downloading file.");
+    }
+  };
+
   const handleScoreDataset = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedModel || !selectedDataset) {
@@ -154,13 +178,13 @@ export default function Predictions() {
                   <span>{message.text}</span>
                 </div>
                 {message.downloadId && (
-                  <a
-                    href={`http://localhost:8000/api/v1/predictions/download/${message.downloadId}`}
+                  <button
+                    onClick={() => handleDownloadPredictions(message.downloadId!)}
                     className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] transition-all"
                   >
                     <Download size={12} />
                     Download Scored CSV
-                  </a>
+                  </button>
                 )}
               </div>
             )}
@@ -221,8 +245,8 @@ export default function Predictions() {
                         <td className="p-3 font-mono">{pred.row_count.toLocaleString()}</td>
                         <td className="p-3">{new Date(pred.created_at).toLocaleString()}</td>
                         <td className="p-3 text-right">
-                          <a
-                            href={`http://localhost:8000/api/v1/predictions/download/${pred.id}`}
+                          <button
+                            onClick={() => handleDownloadPredictions(pred.id)}
                             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-bold border transition-all ${
                               isDark
                                 ? 'bg-emerald-950/40 text-emerald-400 border-emerald-850 hover:bg-emerald-900/60'
@@ -231,7 +255,7 @@ export default function Predictions() {
                           >
                             <Download size={12} />
                             Download CSV
-                          </a>
+                          </button>
                         </td>
                       </tr>
                     ))

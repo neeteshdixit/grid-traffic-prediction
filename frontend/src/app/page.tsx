@@ -74,7 +74,7 @@ export default function Home() {
           full_name: 'System Administrator',
           role: 'admin',
         });
-        if (currentPage === 'landing' || currentPage === 'login') {
+        if (currentPage === 'login') {
           setCurrentPage('dashboard');
         }
         setLoading(false);
@@ -89,7 +89,7 @@ export default function Home() {
         if (res.ok) {
           const profile = await res.json();
           setUser(profile);
-          if (currentPage === 'landing' || currentPage === 'login') {
+          if (currentPage === 'login') {
             setCurrentPage('dashboard');
           }
         } else {
@@ -106,7 +106,7 @@ export default function Home() {
           full_name: 'System Administrator',
           role: 'admin',
         });
-        if (currentPage === 'landing' || currentPage === 'login') {
+        if (currentPage === 'login') {
           setCurrentPage('dashboard');
         }
       } finally {
@@ -140,13 +140,21 @@ export default function Home() {
     );
   }
 
-  if (currentPage === 'landing' && !user) {
+  if (currentPage === 'landing') {
     return (
       <div className={`page-shell min-h-screen ${isDark ? 'dark-theme bg-[#050814] text-slate-100' : 'light-theme bg-slate-50 text-slate-900'}`}>
         <CursorGlow />
         <AnimatePresence mode="wait">
           <motion.div key="landing" variants={pageMotion} initial="initial" animate="animate" exit="exit">
-            <Landing onGoToLogin={() => setCurrentPage('login')} />
+            <Landing onGoToLogin={() => {
+              setUser({
+                id: 'mock-admin-id',
+                email: 'admin@traffic.ai',
+                full_name: 'System Administrator',
+                role: 'admin',
+              });
+              setCurrentPage('dashboard');
+            }} />
           </motion.div>
         </AnimatePresence>
       </div>

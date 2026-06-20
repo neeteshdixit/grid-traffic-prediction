@@ -33,6 +33,29 @@ export default function Analytics() {
 
   const isDark = theme === 'dark';
 
+  const handleExportCSV = () => {
+    const csvRows = [];
+    csvRows.push("Type,Time/Day,Value/Load");
+    
+    hourlyProfiles.forEach(p => {
+      csvRows.push(`Hourly Profile,${p.hour},${p.load}`);
+    });
+    weeklyProfiles.forEach(p => {
+      csvRows.push(`Weekly Profile,${p.day},${p.load}`);
+    });
+
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `traffic_analytics_report.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -44,7 +67,7 @@ export default function Analytics() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => alert('Exporting Analytics Workspace state...')}
+            onClick={handleExportCSV}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
               isDark
                 ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800'

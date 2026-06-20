@@ -5,8 +5,32 @@ import { useStore } from '../store/useStore';
 import { FileText, Download, CheckCircle, Clock, Sparkles } from 'lucide-react';
 
 export default function Reports() {
-  const { theme } = useStore();
+  const { token, theme } = useStore();
   const isDark = theme === 'dark';
+
+  const handleDownloadReport = async (reportId: string) => {
+    try {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + `/api/v1/reports/pdf/${reportId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${reportId}_Report.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert("Failed to download PDF report file.");
+      }
+    } catch (err) {
+      console.error("Error downloading report:", err);
+      alert("Error downloading report.");
+    }
+  };
 
   const mockReports = [
     {
@@ -89,7 +113,7 @@ export default function Reports() {
                   {report.status.toUpperCase()}
                 </span>
                 <button
-                  onClick={() => alert(`Downloading report ${report.id} PDF...`)}
+                  onClick={() => handleDownloadReport(report.id)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
                     isDark
                       ? 'bg-sky-950/40 border-sky-850 text-sky-400 hover:bg-sky-900/60'
@@ -113,7 +137,7 @@ export default function Reports() {
           <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-550'} mb-4`}>Trigger compiling task loops to assemble metrics logs.</p>
 
           <button
-            onClick={() => alert('Generating dynamic report PDF. It will appear in your ledger shortly.')}
+            onClick={() => handleDownloadReport('REP-001')}
             className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
               isDark
                 ? 'bg-sky-500 text-slate-950 hover:bg-sky-400'
