@@ -149,6 +149,14 @@ class TrafficMLPipeline:
     # Base feature engineering
     # ------------------------------------------------------------------
     def _prepare_base_frame(self, df: pd.DataFrame) -> pd.DataFrame:
+        if df.empty:
+            frame = df.copy()
+            # Initialize empty columns to match expected schema
+            for col in ["geohash", "latitude", "longitude", "geohash_prefix4", "hour", "minute", "minute_of_day", "sin_time", "cos_time", "day", "is_weekend", "is_rush_hour", "is_night", "NumberofLanes", "Temperature", "road_missing", "weather_missing", "temperature_missing", "LargeVehicles", "Landmarks", "RoadType", "Weather"]:
+                if col not in frame.columns:
+                    frame[col] = pd.Series(dtype=float if col in ["latitude", "longitude", "sin_time", "cos_time", "NumberofLanes", "Temperature"] else object)
+            return frame
+
         frame = df.copy()
 
         # Standardize column names to lowercase/common forms
@@ -591,6 +599,8 @@ class TrafficMLPipeline:
         return model
 
     def _predict_model(self, model: Any, X: pd.DataFrame) -> np.ndarray:
+        if X.empty:
+            return np.array([], dtype=float)
         preds = model.predict(X)
         return np.clip(np.asarray(preds, dtype=float), 0.0, 1.0)
 
