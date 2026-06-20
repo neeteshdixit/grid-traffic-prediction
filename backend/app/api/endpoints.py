@@ -224,6 +224,24 @@ def get_dataset_profile(id: str, db = Depends(get_db), current_user: Dict[str, A
         "schema_info": dataset["schema_info"]
     }
 
+@router.delete("/datasets/{id}", status_code=status.HTTP_200_OK)
+def delete_dataset(id: str, db = Depends(get_db), current_user: Dict[str, Any] = Depends(get_current_user)):
+    dataset = db.datasets.find_one({"_id": id})
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    
+    # Delete physical file if it exists
+    filepath = dataset.get("filepath")
+    if filepath and os.path.exists(filepath):
+        try:
+            os.remove(filepath)
+        except Exception as e:
+            print(f"Failed to delete file {filepath}: {e}")
+            
+    db.datasets.delete_one({"_id": id})
+    log_audit(db, current_user["_id"], "DATASET_DELETE", f"Deleted dataset: {dataset.get('name')}")
+    return {"message": "Dataset deleted successfully"}
+
 
 # =====================================================================
 # 3. TRAINING MODULE (AutoML)
@@ -325,58 +343,26 @@ def get_model_leaderboard(db = Depends(get_db), current_user: Dict[str, Any] = D
     docs = list(db.models.find().sort("r2_score", -1))
     return serialize_docs(docs)
 
-
-# =====================================================================
-# 4. PREDICTION CENTER MODULE
-# =====================================================================
-@router.post("/predictions/score", response_model=PredictionOut, status_code=status.HTTP_201_CREATED)
-def generate_predictions(
-    pred_in: PredictionCreate,
-    db = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-):
-    model = db.models.find_one({"_id": pred_in.model_id})
+@router.delete("/models/{id}", status_code=status.HTTP_200_OK)
+def delete_model(id: str, db = Depends(get_db), current_user: Dict[str, Any] = Depends(get_current_user)):
+    model = db.models.find_one({"_id": id})
     if not model:
         raise HTTPException(status_code=404, detail="Model not found")
         
-    dataset = db.datasets.find_one({"_id": pred_in.dataset_id})
-    if not dataset:
-        raise HTTPException(status_code=404, detail="Dataset not found")
-        
-    if not os.path.exists(dataset["filepath"]):
-        raise HTTPException(
-            status_code=400,
-            detail="Dataset CSV file not found on the server disk. Since the server was recently redeployed/restarted, please re-upload the CSV file in 'Dataset Studio' first."
-        )
-        
-    # Check if trained model files exist on the server disk
-    pipeline_path = os.path.join(settings.MODEL_DIR, "traffic_pipeline.joblib")
-    model_path = os.path.join(settings.MODEL_DIR, "champion_model.joblib")
-    if not os.path.exists(pipeline_path) or not os.path.exists(model_path):
-        raise HTTPException(
-            status_code=400,
-            detail="Model files not found on the server disk. Since the server was recently redeployed/restarted, please run model training first to generate the model."
-        )
-        
-    pred_uuid = str(uuid.uuid4())
-    output_filename = f"{pred_uuid}.csv"
-    output_path = os.path.join(settings.PREDICTION_DIR, output_filename)
-    
-    try:
-        pipeline = TrafficMLPipeline()
-        # Load the pipeline model state
-        pipeline.load_pipeline(settings.MODEL_DIR)
-        
-        # Run predictions
-        submission_df = pipeline.predict_test(dataset["filepath"], settings.MODEL_DIR)
-        row_count = len(submission_df)
-        
-        # Save output to disk
-        submission_df.to_csv(output_path, index=False)
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Scoring failed: {str(e)}")
-        
+    filepath = model.get("filepath")
+    if filepath and os.path.exists(filepath):
+        try:
+            os.remove(filepath)
+        except Exception as e:
+            print(f"Failed to delete model file {filepath}: {e}")
+            
+    db.models.delete_one({"_id": id})
+    log_audit(db, current_user["_id"], "MODEL_DELETE", f"Deleted model: {model.get('name')}")
+    return {"message": "Model deleted successfully"}
+
+
+# =====================================================================
+
     prediction = {
         "_id": pred_uuid,
         "model_id": pred_in.model_id,

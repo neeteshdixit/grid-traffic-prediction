@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
-import { Cpu, Play, Terminal, Trophy, Loader2 } from 'lucide-react';
+import { Cpu, Play, Terminal, Trophy, Loader2, Trash2 } from 'lucide-react';
 
 export default function Training() {
   const { token, theme, datasets, models, setModels } = useStore();
@@ -46,6 +46,26 @@ export default function Training() {
     }
 
     return [];
+  };
+
+  const handleDeleteModel = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this model? This will also remove the model file from the server.")) return;
+    try {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + `/api/v1/models/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        logToConsole("Model deleted successfully!");
+        fetchMetadata();
+      } else {
+        const err = await res.json();
+        alert(err.detail || 'Failed to delete model.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Connection error while deleting model.');
+    }
   };
 
   const logToConsole = (text: string) => {
@@ -318,6 +338,7 @@ export default function Training() {
                 <th className="p-3">RMSE</th>
                 <th className="p-3">Training Date</th>
                 <th className="p-3 text-right">Status</th>
+                <th className="p-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 text-xs">
@@ -336,10 +357,13 @@ export default function Training() {
                   <td className="p-3 text-right">
                     <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-950/40 text-emerald-400 border border-emerald-850">ACTIVE</span>
                   </td>
+                  <td className="p-3 text-right text-slate-500 italic text-[10px]">
+                    System Default
+                  </td>
                 </tr>
               ) : (
                 models.map((m, idx) => (
-                  <tr key={m.id} className={`hover:bg-slate-800/10 ${isDark ? 'text-slate-300 border-slate-850' : 'text-slate-700 border-slate-200'}`}>
+                  <tr key={m.id} className={`hover:bg-slate-800/10 ${isDark ? 'text-slate-300 border-slate-850' : 'text-slate-770 border-slate-200'}`}>
                     <td className="p-3 font-bold font-mono">{idx + 1}</td>
                     <td className="p-3 font-semibold flex items-center gap-1.5">
                       {m.name}
@@ -358,6 +382,19 @@ export default function Training() {
                       }`}>
                         {m.is_active ? 'ACTIVE' : 'STANDBY'}
                       </span>
+                    </td>
+                    <td className="p-3 text-right">
+                      <button
+                        onClick={() => handleDeleteModel(m.id)}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-bold border transition-all ${
+                          isDark
+                            ? 'bg-red-950/40 text-red-400 border-red-900/50 hover:bg-red-900/60'
+                            : 'bg-red-50 text-red-700 border-red-100 hover:bg-red-100'
+                        }`}
+                      >
+                        <Trash2 size={12} />
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))
