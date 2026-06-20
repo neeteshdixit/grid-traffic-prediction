@@ -908,12 +908,12 @@ def download_pdf_report(
         
         docs = list(db.parking_hotspots.find().sort("total_violations", -1).limit(5))
         data = [['Location', 'Geohash', 'Total Offenses', 'Congestion Score']]
-        for doc in docs:
+        for item in docs:
             data.append([
-                doc.get('location', 'Unknown')[:35],
-                doc.get('geohash', 'N/A'),
-                str(doc.get('total_violations', 0)),
-                f"{doc.get('congestion_score', 0)}/100"
+                item.get('location', 'Unknown')[:35],
+                item.get('geohash', 'N/A'),
+                str(item.get('total_violations', 0)),
+                f"{item.get('congestion_score', 0)}/100"
             ])
             
         t = Table(data, colWidths=[180, 80, 110, 110])
