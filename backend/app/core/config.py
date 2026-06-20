@@ -17,6 +17,10 @@ class Settings:
     # MongoDB configuration
     MONGODB_URL: str = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
     MONGODB_DB_NAME: str = os.getenv("MONGODB_DB_NAME", "traffic_prediction")
+    
+    # Ollama LLM configuration
+    OLLAMA_API_URL: str = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "")
 
 
 settings = Settings()

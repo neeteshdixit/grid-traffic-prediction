@@ -605,20 +605,26 @@ import urllib.error
 
 def get_ollama_model() -> Optional[str]:
     try:
-        req = urllib.request.Request("http://localhost:11434/api/tags")
+        configured_model = getattr(settings, "OLLAMA_MODEL", "")
+        # Check connection to Ollama API
+        req = urllib.request.Request(f"{settings.OLLAMA_API_URL}/api/tags")
         with urllib.request.urlopen(req, timeout=1.5) as response:
             if response.status == 200:
+                if configured_model:
+                    return configured_model
                 data = json.loads(response.read().decode())
                 models = data.get("models", [])
                 if models:
                     return models[0]["name"]
+                # Fallback to a default common model name if server is online but tags list is empty
+                return "llama3"
     except Exception:
         pass
     return None
 
 def query_ollama(model: str, system_prompt: str, user_prompt: str) -> Optional[str]:
     try:
-        url = "http://localhost:11434/api/generate"
+        url = f"{settings.OLLAMA_API_URL}/api/generate"
         payload = {
             "model": model,
             "prompt": f"System: {system_prompt}\nUser: {user_prompt}\nAssistant:",
