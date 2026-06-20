@@ -653,6 +653,10 @@ class TrafficMLPipeline:
         if "demand" not in df_raw.columns:
             raise ValueError("Training dataset must contain the demand column.")
 
+        # Auto-sample large datasets to prevent container crash (Render OOM / event loop block)
+        if len(df_raw) > 5000:
+            df_raw = df_raw.sample(n=5000, random_state=42).reset_index(drop=True)
+
         groups = df_raw["geohash"].astype(str).values if "geohash" in df_raw.columns else np.arange(len(df_raw))
         y_all = pd.to_numeric(df_raw["demand"], errors="coerce").fillna(0.0).values
 

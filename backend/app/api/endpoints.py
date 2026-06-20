@@ -282,6 +282,12 @@ def start_training(
     if dataset.get("type") != "train":
         raise HTTPException(status_code=400, detail="AutoML training requires a dataset of type 'train'")
         
+    if not os.path.exists(dataset["filepath"]):
+        raise HTTPException(
+            status_code=400,
+            detail="Dataset CSV file not found on the server disk. Since the server was recently redeployed/restarted, please re-upload the CSV file in 'Dataset Studio' first."
+        )
+        
     experiment_id = str(uuid.uuid4())
     experiment = {
         "_id": experiment_id,
@@ -336,6 +342,21 @@ def generate_predictions(
     dataset = db.datasets.find_one({"_id": pred_in.dataset_id})
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
+        
+    if not os.path.exists(dataset["filepath"]):
+        raise HTTPException(
+            status_code=400,
+            detail="Dataset CSV file not found on the server disk. Since the server was recently redeployed/restarted, please re-upload the CSV file in 'Dataset Studio' first."
+        )
+        
+    # Check if trained model files exist on the server disk
+    pipeline_path = os.path.join(settings.MODEL_DIR, "traffic_pipeline.joblib")
+    model_path = os.path.join(settings.MODEL_DIR, "champion_model.joblib")
+    if not os.path.exists(pipeline_path) or not os.path.exists(model_path):
+        raise HTTPException(
+            status_code=400,
+            detail="Model files not found on the server disk. Since the server was recently redeployed/restarted, please run model training first to generate the model."
+        )
         
     pred_uuid = str(uuid.uuid4())
     output_filename = f"{pred_uuid}.csv"
