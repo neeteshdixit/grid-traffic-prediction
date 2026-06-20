@@ -16,6 +16,9 @@ from backend.app.api.endpoints import router as api_router
 try:
     db.command("ping")
     print("Successfully connected to MongoDB database.")
+    # Auto-seed default roles and users
+    from backend.app.seed_db import seed
+    seed()
 except Exception as e:
     print(f"Warning: Failed to connect to MongoDB: {str(e)}")
 
